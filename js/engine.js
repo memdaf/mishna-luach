@@ -25,7 +25,7 @@
   const MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   function createEngine(hebcal, data, lang) {
-    const { HDate, getSedra, HebrewCalendar, Locale, flags, gematriya, gematriyaStrToNum, parshiot } = hebcal;
+    const { HDate, getSedra, HebrewCalendar, Locale, gematriya, gematriyaStrToNum, parshiot } = hebcal;
     const EN = lang === 'en';
     const LOCALE = EN ? 'ashkenazi' : 'he-x-NoNikud';
     const TISHREI = 7;
@@ -79,10 +79,25 @@
       w.display = weekDisplay(w);
       return (weekCache[k] = w);
     }
+    // שם השבוע כשחל חג בשבת, באותם נוסחים כמו בדלפי (Parsha ב-HDateU)
+    const CHAG_WEEK = {
+      'Rosh Hashana': ['א\' דראש השנה', 'Rosh Hashanah day 1'],
+      'Yom Kippur': ['יום הכיפורים', 'Yom Kippur'],
+      'Sukkot': ['א\' דסוכות', 'Sukkos day 1'],
+      'Sukkot Shabbat Chol ha-Moed': ['שחוהמ"ס', 'Shabbos Chol Hamoed Sukkos'],
+      'Shmini Atzeret': ['שמיני עצרת', 'Shemini Atzeres'],
+      'Pesach': ['א\' דפסח', 'Pesach day 1'],
+      'Pesach I': ['א\' דפסח', 'Pesach day 1'],
+      'Pesach Shabbat Chol ha-Moed': ['שחוהמ"פ', 'Shabbos Chol Hamoed Pesach'],
+      'Pesach VII': ['שביעי של פסח', "Shevi'i shel Pesach"],
+      'Pesach VIII': ['אחרון של פסח', 'Acharon shel Pesach'],
+      'Shavuot': ['ב\' דשבועות', 'Shavuos day 2'],
+    };
+    const chagWeekName = h => CHAG_WEEK[h] ? CHAG_WEEK[h][EN ? 1 : 0] : loc(h);
     function weekDisplay(w) {
       const names = w.codes.map(parshaName).join('-');
       if (!w.holiday) return names;
-      return names ? loc(w.holiday) + ' (' + names + ')' : loc(w.holiday);
+      return names ? chagWeekName(w.holiday) + ' (' + names + ')' : chagWeekName(w.holiday);
     }
 
     // מחזור הלימוד מתחיל בשבוע של פרשת בראשית
@@ -98,20 +113,98 @@
       };
     }
 
-    function holidaysOn(hd, il) {
-      return HebrewCalendar.getHolidaysOnDate(hd, il) || [];
-    }
-    // חגים, צומות, ר"ח ושבתות מיוחדות. בלי ימים ממלכתיים
-    const SKIP = flags.MODERN_HOLIDAY | flags.BEHAB | flags.YOM_KIPPUR_KATAN | flags.SHABBAT_MEVARCHIM;
+    // עמודת החג: העתק של yomimHeb מ-HDateU בדלפי, באותם נוסחים ("א' דחנוכה", "א' דר"ח טבת").
+    // בחו"ל נוספו: ח' דפסח, ב' דשבועות ושמחת תורה, ו"איסרו חג" יום אחריהם.
+    const HE_LETTERS = 'אבגדהוזח';
     function holidayText(hd, il) {
-      return holidaysOn(hd, il)
-        .filter(e => {
-          const f = e.getFlags();
-          if (f & SKIP) return false;
-          return e.getDesc() !== 'Chag HaBanot';
-        })
-        .map(e => plain(e.render(LOCALE)).replace(/\s+\d{4}$/, ''))
-        .join(', ');
+      const y = hd.getFullYear(), d = hd.getDate(), wd = hd.getDay() + 1; // 1=ראשון ... 7=שבת
+      const leap = HDate.isLeapYear(y);
+      let m = hd.getMonth();          // Hebcal: 1=ניסן ... 12=אדר (אדר א' בשנה מעוברת), 13=אדר ב'
+      if (leap && m >= 12) m += 1;    // כמו בדלפי: 12=אדר, 13=אדר א', 14=אדר ב'
+      const t = 100 * m + d;
+      const S = (he, en) => EN ? en : he;
+      // n: 0=א'. באנגלית: "Chanukah day 1"
+      const nth = (n, he, en) => EN ? en + ' day ' + (n + 1) : HE_LETTERS[n] + "' ד" + he;
+      // ראש חודש. n<0: ר"ח של יום אחד
+      const rc = (n, he, en) => n < 0 ? S('ר"ח ' + he, 'Rosh Chodesh ' + en) : nth(n, 'ר"ח ' + he, 'Rosh Chodesh ' + en);
+      const isru = S('איסרו חג', 'Isru Chag');
+      const chanuka = n => nth(n, 'חנוכה', 'Chanukah');
+      const shortKislev = HDate.shortKislev(y);
+      let r = '';
+
+      if (!il && t === 122) r = nth(7, 'פסח', 'Pesach');
+      else if (!il && t === 123) r = isru;
+      else if (!il && t === 307) r = nth(1, 'שבועות', 'Shavuos');
+      else if (!il && t === 308) r = isru;
+      else if (!il && t === 723) r = S('שמחת תורה', 'Simchas Torah');
+      else if (!il && t === 724) r = isru;
+      else if (t >= 115 && t <= 121) r = nth(d - 15, 'פסח', 'Pesach');
+      else if (t >= 303 && t <= 304) r = nth(d - 3, 'שלשת ימי הגבלה', 'Shloshes Yemei Hagbalah');
+      else if (t >= 715 && t <= 720) r = nth(d - 15, 'סוכות', 'Sukkos');
+      else if (t >= 925 && t <= 929) r = chanuka(d - 25);
+      else switch (t) {
+        case 101: r = rc(-1, 'ניסן', 'Nissan'); break;
+        case 112: if (wd === 5) r = S('תענית בכורות מוקדם', 'Taanis Bechoros (early)'); break;
+        case 114:
+          r = S('ערב פסח', 'Erev Pesach');
+          if (wd !== 7) r += S(', תענית בכורות', ', Taanis Bechoros');
+          break;
+        case 122: r = isru; break;
+        case 130: case 201: r = rc(t & 1, 'אייר', 'Iyar'); break;
+        case 218: r = S('ל"ג בעומר', 'Lag BaOmer'); break;
+        case 301: r = rc(-1, 'סיון', 'Sivan'); break;
+        case 305: r = S('ערב שבועות', 'Erev Shavuos'); break;
+        case 306: r = S('שבועות', 'Shavuos'); break;
+        case 307: r = isru; break;
+        case 330: case 401: r = rc(t & 1, 'תמוז', 'Tammuz'); break;
+        case 417: if (wd !== 7) r = S('י"ז בתמוז', "Shiva Asar B'Tammuz"); break;
+        case 418: if (wd === 1) r = S('שבעה עשר בתמוז נדחה', "Shiva Asar B'Tammuz (nidcheh)"); break;
+        case 501: r = rc(-1, 'מנחם אב', 'Menachem Av'); break;
+        case 509: if (wd !== 7) r = S('תשעה באב', "Tishah B'Av"); break;
+        case 510: if (wd === 1) r = S('תשעה באב נדחה', "Tishah B'Av (nidcheh)"); break;
+        case 515: r = S('ט"ו באב', "Tu B'Av"); break;
+        case 530: case 601: r = rc(t & 1, 'אלול', 'Elul'); break;
+        case 629: r = S('ערב ראש השנה', 'Erev Rosh Hashanah'); break;
+        case 701: case 702: r = nth(d - 1, 'ראש השנה', 'Rosh Hashanah'); break;
+        case 703: case 704:
+          if ((d === 3 && wd !== 7) || (d === 4 && wd === 1)) r = S('צום גדליה', 'Tzom Gedaliah');
+          break;
+        case 709: r = S('ערב יום הכיפורים', 'Erev Yom Kippur'); break;
+        case 710: r = S('יום הכיפורים', 'Yom Kippur'); break;
+        case 714: r = S('ערב סוכות', 'Erev Sukkos'); break;
+        case 721: r = S('הושענא רבה', 'Hoshana Rabbah'); break;
+        case 722: r = S('שמיני עצרת', 'Shemini Atzeres'); break;
+        case 723: r = isru; break;
+        case 730: case 801: r = rc(t & 1, 'חשון', 'Cheshvan'); break;
+        case 830: r = rc(0, 'כסלו', 'Kislev'); break;
+        case 901: r = rc(HDate.longCheshvan(y) ? 1 : -1, 'כסלו', 'Kislev'); break;
+        case 924: r = S('ערב חנוכה', 'Erev Chanukah'); break;
+        case 930: r = chanuka(5) + ', ' + rc(0, 'טבת', 'Teves'); break;
+        case 1001: r = shortKislev ? chanuka(5) + ', ' + rc(-1, 'טבת', 'Teves') : chanuka(6) + ', ' + rc(1, 'טבת', 'Teves'); break;
+        case 1002: r = chanuka(shortKislev ? 6 : 7); break;
+        case 1003: if (shortKislev) r = chanuka(7); break;
+        case 1010: r = S('עשרה בטבת', "Asarah B'Teves"); break;
+        case 1101: r = rc(-1, 'שבט', 'Shevat'); break;
+        case 1115: r = S('ט"ו בשבט', "Tu B'Shevat"); break;
+        case 1130: r = leap ? rc(0, 'אדר ראשון', 'Adar I') : rc(0, 'אדר', 'Adar'); break;
+        case 1201: r = rc(1, 'אדר', 'Adar'); break;
+        case 1301: r = rc(1, 'אדר ראשון', 'Adar I'); break;
+        case 1211: case 1411: if (wd === 5) r = S('תענית אסתר מוקדם', 'Taanis Esther (early)'); break;
+        case 1213: case 1413: if (wd !== 7) r = S('תענית אסתר', 'Taanis Esther'); break;
+        case 1214: case 1414: r = S('פורים', 'Purim'); break;
+        case 1215: case 1415: r = S('שושן פורים', 'Shushan Purim'); break;
+        case 1216: case 1416: if (wd === 1) r = S('פורים המשולש', 'Purim Meshulash'); break;
+        case 1314: r = S('פורים קטן', 'Purim Katan'); break;
+        case 1315: r = S('שושן פורים קטן', 'Shushan Purim Katan'); break;
+        case 1330: r = rc(0, 'אדר שני', 'Adar II'); break;
+        case 1401: r = rc(1, 'אדר שני', 'Adar II'); break;
+      }
+
+      if (t > 702 && t < 710 && wd === 7) r = S('שבת שובה', 'Shabbos Shuvah');
+      else if (t > 703 && t < 709 && !r) r = S('עשרת ימי תשובה', 'Aseres Yemei Teshuvah');
+      else if (t > 503 && t < 510 && wd === 7) r = S('שבת חזון', 'Shabbos Chazon');
+      else if (t > 509 && t < 517 && wd === 7) r = S('שבת נחמו', 'Shabbos Nachamu');
+      return r;
     }
 
     function monthName(m, y) { return loc(HDate.getMonthName(m, y)); }
