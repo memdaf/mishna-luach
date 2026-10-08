@@ -5,7 +5,14 @@
 ## פתיחה
 פותחים את `index.html` בלחיצה כפולה. האתר עובד גם בלי אינטרנט, אבל אז הגופנים יוחלפו בגופני ברירת מחדל.
 
-## להעלאה לאינטרנט
+## האתר באוויר
+- כתובת: https://memdaf.github.io/mishna-luach/
+- המאגר: https://github.com/memdaf/mishna-luach (ציבורי, GitHub Pages מענף `main`)
+- **עדכון:** מתוך התיקייה `Web`: `git add -A`, ואחר כך `git commit -m "תיאור השינוי"`, ואחר כך `git push`. האתר מתעדכן אחרי דקה-שתיים.
+- **מחיקה:** `gh repo delete memdaf/mishna-luach`
+- `.gitignore` מונע העלאה של `node_modules`, `tools` ו-`package*.json`.
+
+## להעלאה לאחסון אחר
 מעלים לכל אחסון סטטי (GitHub Pages, Netlify, אתר קיים) את התיקיות והקבצים הבאים:
 `index.html`, `css/`, `js/`, `lib/`, `data/`.
 אין צורך להעלות את `node_modules/`, `tools/` ו-`package*.json`.
