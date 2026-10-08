@@ -167,15 +167,39 @@
     return wb;
   }
 
+  // שמירה: בכרום ובאדג' נפתח חלון "שמירה בשם" (שם הקובץ ומיקום), עם fileName כברירת מחדל.
+  // את החלון צריך לפתוח מיד בלחיצה, לפני בניית הקובץ, אחרת הדפדפן חוסם אותו.
+  // דפדפן בלי האפשרות הזאת (פיירפוקס, ספארי): הורדה רגילה לתיקיית ההורדות.
+  // ביטול החלון: מחזיר false ולא שומר.
+  const XLSX_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   async function downloadExcel(ExcelJS, c, ticked, fileName) {
+    let handle = null;
+    if (typeof window.showSaveFilePicker === 'function') {
+      try {
+        handle = await window.showSaveFilePicker({
+          suggestedName: fileName,
+          types: [{ description: 'Excel', accept: { [XLSX_TYPE]: ['.xlsx'] } }],
+        });
+      } catch (e) {
+        if (e.name === 'AbortError') return false;
+        handle = null; // החלון לא זמין כאן - ממשיכים בהורדה רגילה
+      }
+    }
     const buf = await buildExcel(ExcelJS, c, ticked).xlsx.writeBuffer();
-    const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    if (handle) {
+      const w = await handle.createWritable();
+      await w.write(buf);
+      await w.close();
+      return true;
+    }
+    const blob = new Blob([buf], { type: XLSX_TYPE });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = fileName;
     document.body.appendChild(a);
     a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+    return true;
   }
 
   root.LuachExcel = { buildExcel, downloadExcel };
