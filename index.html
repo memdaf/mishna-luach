@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>לוח משנה לחק</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Assistant:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <h1>לוח משנה לחק</h1>
+    <p class="lede">לוח לימוד אישי: פרק החק של הפרשה בכל יום, ועוד משנה לחק, עד שמסיימים את כל ששה סדרי משנה.</p>
+  </header>
+
+  <form id="controls" class="controls" autocomplete="off">
+    <fieldset class="field">
+      <legend>סוג הלוח</legend>
+      <div class="seg" role="radiogroup">
+        <label><input type="radio" name="mode" id="mode-annual" value="annual" checked><span>שנתי</span></label>
+        <label><input type="radio" name="mode" id="mode-two" value="two"><span>דו שנתי</span></label>
+        <label><input type="radio" name="mode" id="mode-range" value="range"><span>מתאריך עד תאריך</span></label>
+        <label><input type="radio" name="mode" id="mode-yahrzeit" value="yahrzeit"><span>לוח יארצייט</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset class="field">
+      <legend>מקום</legend>
+      <div class="seg" role="radiogroup">
+        <label><input type="radio" name="place" id="place-il" value="il" checked><span>ארץ ישראל</span></label>
+        <label><input type="radio" name="place" id="place-chul" value="chul"><span>חוץ לארץ</span></label>
+      </div>
+    </fieldset>
+
+    <div class="field" data-for="annual">
+      <label for="cycleYear">שנת הלימוד</label>
+      <select id="cycleYear"></select>
+      <small class="hint">מפרשת בראשית ועד וזאת הברכה</small>
+    </div>
+
+    <div class="field" data-for="two">
+      <label for="twoStart">שנה א' מתחילה ב</label>
+      <select id="twoStart"></select>
+      <small class="hint">שנתיים, משנה א' ועד סוף שנה ב'</small>
+    </div>
+
+    <div class="field-group" data-for="range yahrzeit">
+      <label class="check heb-toggle"><input type="checkbox" id="hebInput"> תאריך עברי</label>
+      <div class="field" data-for="range">
+        <label for="fromDate">מתאריך</label>
+        <input type="date" id="fromDate">
+        <small class="hint" id="fromHeb"></small>
+      </div>
+      <div class="field" data-for="range">
+        <label for="toDate">עד תאריך</label>
+        <input type="date" id="toDate">
+        <small class="hint" id="toHeb"></small>
+      </div>
+      <div class="field" data-for="yahrzeit">
+        <label for="deathDate">תאריך הפטירה</label>
+        <input type="date" id="deathDate">
+        <span class="adar-choice" id="adarChoice" hidden>
+          בשנה מעוברת:
+          <label class="check"><input type="radio" name="adar" id="adar-1" value="1" checked> אדר א'</label>
+          <label class="check"><input type="radio" name="adar" id="adar-2" value="2"> אדר ב'</label>
+        </span>
+      </div>
+      <div class="field" data-for="yahrzeit">
+        <label for="yzYear">הלוח מתחיל ביארצייט של</label>
+        <select id="yzYear"></select>
+      </div>
+    </div>
+
+    <div class="field grow" data-for="range yahrzeit">
+      <label for="niftar">לעילוי נשמת (לא חובה)</label>
+      <input type="text" id="niftar" placeholder="פלוני בן פלוני">
+    </div>
+  </form>
+
+  <div class="toolbar">
+    <p id="summary" class="summary" aria-live="polite"></p>
+    <div class="actions export">
+      <button type="button" id="btnToday" class="btn ghost">קפוץ להיום</button>
+      <button type="button" id="btnPrint" class="btn">הדפסה / PDF</button>
+      <button type="button" id="btnExcel" class="btn">Excel</button>
+    </div>
+    <p class="preview-note">בתצוגה המקדימה אין הדפסה וייצוא ל-Excel. הם עובדים כשפותחים את האתר עצמו.</p>
+  </div>
+
+  <section class="sheet" id="sheet">
+    <header class="sheet-head">
+      <h2 id="sheetTitle"></h2>
+      <p id="sheetDedication" class="dedication"></p>
+    </header>
+    <div class="table-scroll">
+      <table class="luach">
+        <thead>
+          <tr>
+            <th>תאריך</th>
+            <th>תאריך עברי</th>
+            <th>חג</th>
+            <th>יום</th>
+            <th>פרשה</th>
+            <th>לימוד החק</th>
+            <th class="tick-col" title="נלמד">נלמד</th>
+            <th>משנה לחק</th>
+            <th class="tick-col" title="נלמד">נלמד</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <footer class="sheet-foot">
+      <p id="sheetNote" class="note"></p>
+      <p id="sheetEnd" class="end"></p>
+      <p id="sheetFooter" class="credit"></p>
+    </footer>
+  </section>
+
+  <!-- גרסת ההדפסה: נבנית לפני ההדפסה, מחולקת לדפים עם כותרת תחתונה בכל דף -->
+  <div id="printArea" class="print-area"></div>
+
+</div>
+
+<script src="lib/hebcal.min.js"></script>
+<script src="lib/exceljs.min.js"></script>
+<script src="data/luach_data.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/excel.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
