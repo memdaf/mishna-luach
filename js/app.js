@@ -403,7 +403,15 @@
       '<footer class="pfoot"><span>' + esc(c.footer) + '</span><span class="p-kind"></span><span></span></footer>' +
       '</section>';
   }
-  window.addEventListener('beforeprint', buildPrint);
+  // שם הקובץ (בלי סיומת), זהה ל-Excel ול-PDF: הכותרת בלי תווים אסורים, ורווחים כקו תחתון
+  const fileBase = c => c.title.replace(/["\/\\:*?<>|]/g, '').replace(/\s+/g, '_');
+
+  // ב"שמירה כ-PDF" הדפדפן מציע את כותרת הדף כשם הקובץ. בזמן ההדפסה הכותרת היא שם הקובץ
+  window.addEventListener('beforeprint', () => {
+    buildPrint();
+    if (current) document.title = fileBase(current);
+  });
+  window.addEventListener('afterprint', () => { if (current) document.title = current.title; });
 
   function showEmpty(msg) {
     current = null;
@@ -507,12 +515,12 @@
     if (row) row.scrollIntoView({ block: 'center' });
   });
 
-  $('btnPrint').addEventListener('click', () => { buildPrint(); window.print(); });
+  $('btnPrint').addEventListener('click', () => window.print());
 
   $('btnExcel').addEventListener('click', () => {
     const c = current;
     if (!c) return;
-    const fileName = c.title.replace(/["\/\\:*?<>|]/g, '').replace(/\s+/g, '_') + '.xlsx';
+    const fileName = fileBase(c) + '.xlsx';
     window.LuachExcel.downloadExcel(window.ExcelJS, c, (r, col) => !!ticks[tickKey(r, col)], fileName)
       .catch(err => { $('summary').textContent = t('excelFail') + err.message; });
   });
