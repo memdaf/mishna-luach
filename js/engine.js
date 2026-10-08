@@ -113,9 +113,17 @@
       };
     }
 
-    // עמודת החג: העתק של yomimHeb מ-HDateU בדלפי, באותם נוסחים ("א' דחנוכה", "א' דר"ח טבת").
-    // בחו"ל נוספו: ח' דפסח, ב' דשבועות ושמחת תורה, ו"איסרו חג" יום אחריהם.
+    // עמודת החג: העתק של yomimHeb מ-HDateU בדלפי, בנוסחים של התוכנה המהודרת (Mishnayot.exe):
+    // "א' דחנוכה", "א' דר"ח טבת", "זאת חנוכה", "אסרו חג". בחו"ל: הנוסחים של קוד 'cc'.
+    // נוספו השבתות המיוחדות (שקלים, זכור, פרה, החודש, הגדול).
     const HE_LETTERS = 'אבגדהוזח';
+    const SPECIAL_SHABBAT = {
+      'Shabbat Shekalim': ['שבת שקלים', 'Shabbos Shekalim'],
+      'Shabbat Zachor': ['שבת זכור', 'Shabbos Zachor'],
+      'Shabbat Parah': ['שבת פרה', 'Shabbos Parah'],
+      'Shabbat HaChodesh': ['שבת החודש', 'Shabbos HaChodesh'],
+      'Shabbat HaGadol': ['שבת הגדול', 'Shabbos HaGadol'],
+    };
     function holidayText(hd, il) {
       const y = hd.getFullYear(), d = hd.getDate(), wd = hd.getDay() + 1; // 1=ראשון ... 7=שבת
       const leap = HDate.isLeapYear(y);
@@ -127,18 +135,21 @@
       const nth = (n, he, en) => EN ? en + ' day ' + (n + 1) : HE_LETTERS[n] + "' ד" + he;
       // ראש חודש. n<0: ר"ח של יום אחד
       const rc = (n, he, en) => n < 0 ? S('ר"ח ' + he, 'Rosh Chodesh ' + en) : nth(n, 'ר"ח ' + he, 'Rosh Chodesh ' + en);
-      const isru = S('איסרו חג', 'Isru Chag');
-      const chanuka = n => nth(n, 'חנוכה', 'Chanukah');
+      const isru = S('אסרו חג', 'Isru Chag');
+      const chanuka = n => n === 7 ? S('זאת חנוכה', 'Zos Chanukah') : nth(n, 'חנוכה', 'Chanukah');
       const shortKislev = HDate.shortKislev(y);
       let r = '';
 
-      if (!il && t === 122) r = nth(7, 'פסח', 'Pesach');
+      if (t === 121) r = S('שביעי של פסח', "Shevi'i shel Pesach");
+      else if (!il && t === 122) r = S('אחרון של פסח', 'Acharon shel Pesach');
       else if (!il && t === 123) r = isru;
-      else if (!il && t === 307) r = nth(1, 'שבועות', 'Shavuos');
+      else if (!il && t === 306) r = nth(0, 'חג השבועות', 'Shavuos');
+      else if (!il && t === 307) r = nth(1, 'חג השבועות', 'Shavuos');
       else if (!il && t === 308) r = isru;
+      else if (!il && t === 722) r = S('שמיני עצרת', 'Shemini Atzeres');
       else if (!il && t === 723) r = S('שמחת תורה', 'Simchas Torah');
       else if (!il && t === 724) r = isru;
-      else if (t >= 115 && t <= 121) r = nth(d - 15, 'פסח', 'Pesach');
+      else if (t >= 115 && t <= 120) r = nth(d - 15, 'פסח', 'Pesach');
       else if (t >= 303 && t <= 304) r = nth(d - 3, 'שלשת ימי הגבלה', 'Shloshes Yemei Hagbalah');
       else if (t >= 715 && t <= 720) r = nth(d - 15, 'סוכות', 'Sukkos');
       else if (t >= 925 && t <= 929) r = chanuka(d - 25);
@@ -154,7 +165,7 @@
         case 218: r = S('ל"ג בעומר', 'Lag BaOmer'); break;
         case 301: r = rc(-1, 'סיון', 'Sivan'); break;
         case 305: r = S('ערב שבועות', 'Erev Shavuos'); break;
-        case 306: r = S('שבועות', 'Shavuos'); break;
+        case 306: r = S('חג השבועות', 'Shavuos'); break;
         case 307: r = isru; break;
         case 330: case 401: r = rc(t & 1, 'תמוז', 'Tammuz'); break;
         case 417: if (wd !== 7) r = S('י"ז בתמוז', "Shiva Asar B'Tammuz"); break;
@@ -173,7 +184,7 @@
         case 710: r = S('יום הכיפורים', 'Yom Kippur'); break;
         case 714: r = S('ערב סוכות', 'Erev Sukkos'); break;
         case 721: r = S('הושענא רבה', 'Hoshana Rabbah'); break;
-        case 722: r = S('שמיני עצרת', 'Shemini Atzeres'); break;
+        case 722: r = S('שמיני עצרת ושמחת תורה', 'Shemini Atzeres & Simchas Torah'); break;
         case 723: r = isru; break;
         case 730: case 801: r = rc(t & 1, 'חשון', 'Cheshvan'); break;
         case 830: r = rc(0, 'כסלו', 'Kislev'); break;
@@ -204,6 +215,13 @@
       else if (t > 703 && t < 709 && !r) r = S('עשרת ימי תשובה', 'Aseres Yemei Teshuvah');
       else if (t > 503 && t < 510 && wd === 7) r = S('שבת חזון', 'Shabbos Chazon');
       else if (t > 509 && t < 517 && wd === 7) r = S('שבת נחמו', 'Shabbos Nachamu');
+
+      if (wd === 7) {
+        const special = (HebrewCalendar.getHolidaysOnDate(hd, il) || [])
+          .map(e => SPECIAL_SHABBAT[e.getDesc()]).filter(Boolean)
+          .map(n => n[EN ? 1 : 0]);
+        if (special.length) r = [r].concat(special).filter(Boolean).join(', ');
+      }
       return r;
     }
 
