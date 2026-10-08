@@ -9,6 +9,7 @@
 - כתובת: https://memdaf.github.io/mishna-luach/
 - המאגר: https://github.com/memdaf/mishna-luach (ציבורי, GitHub Pages מענף `main`)
 - **עדכון:** מתוך התיקייה `Web`: `git add -A`, ואחר כך `git commit -m "תיאור השינוי"`, ואחר כך `git push`. האתר מתעדכן אחרי דקה-שתיים.
+- **חשוב בכל עדכון:** ב-`index.html` מעלים את מספר הגרסה (`?v=2` ← `?v=3`) בכל הקישורים לקבצי css ו-js. אחרת דפדפנים (וגם נטפרי) עלולים להמשיך להשתמש בקבצים ישנים מהזיכרון.
 - **מחיקה:** `gh repo delete memdaf/mishna-luach`
 - `.gitignore` מונע העלאה של `node_modules`, `tools` ו-`package*.json`.
 
