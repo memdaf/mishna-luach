@@ -10,85 +10,89 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<!-- הטקסטים בעברית כתובים כאן. באנגלית הם מוחלפים לפי data-i18n (המילון ב-js/i18n.js) -->
 <div class="wrap">
 
   <header class="masthead">
-    <h1>לוח משנה לחק</h1>
-    <p class="lede">בניית לוחות משנה לחק בשילוב פרקי המשניות של "חק לישראל", בכדי לסיים ששה סדרי משנה בשנה או בשנתיים, או לקראת יארצייט</p>
+    <div class="masthead-text">
+      <h1 data-i18n="title">לוח משנה לחק</h1>
+      <p class="lede" data-i18n="lede">בניית לוחות משנה לחק בשילוב פרקי המשניות של "חק לישראל", בכדי לסיים ששה סדרי משנה בשנה או בשנתיים, או לקראת יארצייט</p>
+    </div>
+    <a id="langToggle" class="lang-toggle" href="?lang=en" lang="en">English</a>
   </header>
 
   <form id="controls" class="controls" autocomplete="off">
     <fieldset class="field">
-      <legend>סוג הלוח</legend>
+      <legend data-i18n="legendMode">סוג הלוח</legend>
       <div class="seg" role="radiogroup">
-        <label><input type="radio" name="mode" id="mode-annual" value="annual" checked><span>שנתי</span></label>
-        <label><input type="radio" name="mode" id="mode-two" value="two"><span>דו שנתי</span></label>
-        <label><input type="radio" name="mode" id="mode-range" value="range"><span>מתאריך עד תאריך</span></label>
-        <label><input type="radio" name="mode" id="mode-yahrzeit" value="yahrzeit"><span>לוח יארצייט</span></label>
+        <label><input type="radio" name="mode" id="mode-annual" value="annual" checked><span data-i18n="modeAnnual">שנתי</span></label>
+        <label><input type="radio" name="mode" id="mode-two" value="two"><span data-i18n="modeTwo">דו שנתי</span></label>
+        <label><input type="radio" name="mode" id="mode-range" value="range"><span data-i18n="modeRange">מתאריך עד תאריך</span></label>
+        <label><input type="radio" name="mode" id="mode-yahrzeit" value="yahrzeit"><span data-i18n="modeYahrzeit">לוח יארצייט</span></label>
       </div>
     </fieldset>
 
     <fieldset class="field">
-      <legend>מקום</legend>
+      <legend data-i18n="legendPlace">מקום</legend>
       <div class="seg" role="radiogroup">
-        <label><input type="radio" name="place" id="place-il" value="il" checked><span>ארץ ישראל</span></label>
-        <label><input type="radio" name="place" id="place-chul" value="chul"><span>חוץ לארץ</span></label>
+        <label><input type="radio" name="place" id="place-il" value="il" checked><span data-i18n="placeIl">ארץ ישראל</span></label>
+        <label><input type="radio" name="place" id="place-chul" value="chul"><span data-i18n="placeChul">חוץ לארץ</span></label>
       </div>
     </fieldset>
 
     <div class="field" data-for="annual">
-      <label for="cycleYear">שנת הלימוד</label>
+      <label for="cycleYear" data-i18n="cycleYear">שנת הלימוד</label>
       <select id="cycleYear"></select>
-      <small class="hint">מפרשת בראשית ועד וזאת הברכה</small>
+      <small class="hint" data-i18n="cycleHint">מפרשת בראשית ועד וזאת הברכה</small>
     </div>
 
     <div class="field" data-for="two">
-      <label for="twoStart">שנה א' מתחילה ב</label>
+      <label for="twoStart" data-i18n="twoStart">שנה א' מתחילה ב</label>
       <select id="twoStart"></select>
-      <small class="hint">שנתיים, משנה א' ועד סוף שנה ב'</small>
+      <small class="hint" data-i18n="twoHint">שנתיים, משנה א' ועד סוף שנה ב'</small>
     </div>
 
     <div class="field-group" data-for="range yahrzeit">
-      <label class="check heb-toggle"><input type="checkbox" id="hebInput"> תאריך עברי</label>
+      <label class="check heb-toggle"><input type="checkbox" id="hebInput"> <span data-i18n="hebInput">תאריך עברי</span></label>
       <div class="field" data-for="range">
-        <label for="fromDate">מתאריך</label>
+        <label for="fromDate" data-i18n="fromDate">מתאריך</label>
         <input type="date" id="fromDate">
         <small class="hint" id="fromHeb"></small>
       </div>
       <div class="field" data-for="range">
-        <label for="toDate">עד תאריך</label>
+        <label for="toDate" data-i18n="toDate">עד תאריך</label>
         <input type="date" id="toDate">
         <small class="hint" id="toHeb"></small>
       </div>
       <div class="field" data-for="yahrzeit">
-        <label for="deathDate">תאריך הפטירה</label>
+        <label for="deathDate" data-i18n="deathDate">תאריך הפטירה</label>
         <input type="date" id="deathDate">
         <span class="adar-choice" id="adarChoice" hidden>
-          בשנה מעוברת:
-          <label class="check"><input type="radio" name="adar" id="adar-1" value="1" checked> אדר א'</label>
-          <label class="check"><input type="radio" name="adar" id="adar-2" value="2"> אדר ב'</label>
+          <span data-i18n="leapAdar">בשנה מעוברת:</span>
+          <label class="check"><input type="radio" name="adar" id="adar-1" value="1" checked> <span data-i18n="adar1">אדר א'</span></label>
+          <label class="check"><input type="radio" name="adar" id="adar-2" value="2"> <span data-i18n="adar2">אדר ב'</span></label>
         </span>
       </div>
       <div class="field" data-for="yahrzeit">
-        <label for="yzYear">הלוח מתחיל ביארצייט של</label>
+        <label for="yzYear" data-i18n="yzYear">הלוח מתחיל ביארצייט של</label>
         <select id="yzYear"></select>
       </div>
     </div>
 
     <div class="field grow" data-for="range yahrzeit">
-      <label for="niftar">לעילוי נשמת (לא חובה)</label>
-      <input type="text" id="niftar" placeholder="פלוני בן פלוני">
+      <label for="niftar" data-i18n="niftar">לעילוי נשמת (לא חובה)</label>
+      <input type="text" id="niftar" placeholder="פלוני בן פלוני" data-i18n-ph="niftarPh">
     </div>
   </form>
 
   <div class="toolbar">
     <p id="summary" class="summary" aria-live="polite"></p>
     <div class="actions export">
-      <button type="button" id="btnToday" class="btn ghost">קפוץ להיום</button>
-      <button type="button" id="btnPrint" class="btn">הדפסה / PDF</button>
+      <button type="button" id="btnToday" class="btn ghost" data-i18n="btnToday">קפוץ להיום</button>
+      <button type="button" id="btnPrint" class="btn" data-i18n="btnPrint">הדפסה / PDF</button>
       <button type="button" id="btnExcel" class="btn">Excel</button>
     </div>
-    <p class="preview-note">בתצוגה המקדימה אין הדפסה וייצוא ל-Excel. הם עובדים כשפותחים את האתר עצמו.</p>
+    <p class="preview-note" data-i18n="previewNote">בתצוגה המקדימה אין הדפסה וייצוא ל-Excel. הם עובדים כשפותחים את האתר עצמו.</p>
   </div>
 
   <section class="sheet" id="sheet">
@@ -100,15 +104,15 @@
       <table class="luach">
         <thead>
           <tr>
-            <th>תאריך</th>
-            <th>תאריך עברי</th>
-            <th>חג</th>
-            <th>יום</th>
-            <th>פרשה</th>
-            <th>לימוד החק</th>
-            <th class="tick-col" title="נלמד">נלמד</th>
-            <th>משנה לחק</th>
-            <th class="tick-col" title="נלמד">נלמד</th>
+            <th data-i18n="thDate">תאריך</th>
+            <th data-i18n="thHeb">תאריך עברי</th>
+            <th data-i18n="thChag">חג</th>
+            <th data-i18n="thDay">יום</th>
+            <th data-i18n="thParsha">פרשה</th>
+            <th data-i18n="thChok">לימוד החק</th>
+            <th class="tick-col" data-i18n="thDone">נלמד</th>
+            <th data-i18n="thHash">משנה לחק</th>
+            <th class="tick-col" data-i18n="thDone">נלמד</th>
           </tr>
         </thead>
         <tbody id="rows"></tbody>
@@ -129,6 +133,7 @@
 <script src="lib/hebcal.min.js"></script>
 <script src="lib/exceljs.min.js"></script>
 <script src="data/luach_data.js"></script>
+<script src="js/i18n.js"></script>
 <script src="js/engine.js"></script>
 <script src="js/excel.js"></script>
 <script src="js/app.js"></script>

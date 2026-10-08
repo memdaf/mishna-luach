@@ -62,6 +62,20 @@ body {
   text-wrap: balance;
 }
 .lede { margin: 0; color: var(--muted); }
+.masthead { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.masthead-text { min-width: 0; }
+.lang-toggle {
+  flex: none;
+  font-weight: 600;
+  color: var(--techelet);
+  border: 1px solid var(--techelet);
+  border-radius: 6px;
+  padding: 5px 14px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.lang-toggle:hover { background: var(--techelet-soft); }
+.lang-toggle:focus-visible { outline: 2px solid var(--techelet); outline-offset: 2px; }
 
 /* לוח בקרה */
 .controls {
@@ -282,7 +296,7 @@ html { scroll-behavior: smooth; }
   .ptable th {
     background: var(--techelet-soft);
     border-bottom: 1.2pt solid var(--techelet);
-    font-size: 8pt; text-align: start; padding: 1.2mm 1mm; white-space: nowrap;
+    font-size: 8pt; text-align: start; padding: 0.8mm 1mm; white-space: nowrap; line-height: 1.2;
   }
   .ptable td {
     height: 5mm; padding: 0 1mm; border-bottom: 0.4pt solid var(--line);

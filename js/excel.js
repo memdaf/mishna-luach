@@ -1,10 +1,11 @@
 // ייצוא הלוח ל-Excel בעזרת ExcelJS: כותרת ממורכזת, שורת כותרות מודגשת,
-// עמודות "נלמד" עם רשימת בחירה (✔), ובסוף שורה אחת: מימין "מוגש ע"י", משמאל הסבר הכוכבית.
+// עמודות "נלמד" עם רשימת בחירה (✔), ובסוף שורה אחת: בצד ההתחלה "מוגש ע"י", בצד השני הסבר הכוכבית.
+// בעברית הגיליון מימין לשמאל (c.rtl), באנגלית משמאל לימין.
 (function (root) {
   'use strict';
 
   const COLS = 9;
-  const WIDTHS = [11, 16, 20, 7, 24, 18, 7, 36, 7];
+  const WIDTHS = [12, 16, 20, 9, 24, 18, 7, 36, 7];
   const HEAD = ['תאריך', 'תאריך עברי', 'חג', 'יום', 'פרשה', 'לימוד החק', 'נלמד', 'משנה לחק', 'נלמד'];
   const TICK_COLS = [7, 9];
   const FONT = 'Arial';
@@ -19,22 +20,27 @@
 
   // c: הלוח הנוכחי (current מ-app.js). ticked(r, col): האם סומן "נלמד"
   function buildExcel(ExcelJS, c, ticked) {
+    const rtl = c.rtl !== false;
+    const START = rtl ? 'right' : 'left', END = rtl ? 'left' : 'right';
+    const order = rtl ? 'rtl' : 'ltr';
+    const head = c.head || HEAD;
+
     const wb = new ExcelJS.Workbook();
-    const ws = wb.addWorksheet('לוח', {
-      views: [{ rightToLeft: true }],
+    const ws = wb.addWorksheet(c.sheetName || 'לוח', {
+      views: [{ rightToLeft: rtl }],
       pageSetup: { paperSize: 9, orientation: 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 0 },
     });
     ws.columns = WIDTHS.map(width => ({ width }));
 
     let row = 0;
     // שורה ממוזגת על כל הרוחב
-    const banner = (text, font, align) => {
+    const banner = (text, font) => {
       row++;
       ws.mergeCells(row, 1, row, COLS);
       const cell = ws.getCell(row, 1);
       cell.value = text;
       cell.font = Object.assign({ name: FONT }, font);
-      cell.alignment = { horizontal: align || 'center', vertical: 'middle', readingOrder: 'rtl' };
+      cell.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: order };
       return cell;
     };
 
@@ -50,16 +56,16 @@
     // שורת הכותרות
     row++;
     const headRow = row;
-    HEAD.forEach((h, i) => {
+    head.forEach((h, i) => {
       const cell = ws.getCell(row, i + 1);
       cell.value = h;
       cell.font = { name: FONT, bold: true };
       cell.fill = fill(HEAD_FILL);
-      cell.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: 'rtl' };
+      cell.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: order };
       cell.border = { bottom: { style: 'medium', color: { argb: TECHELET } } };
     });
     ws.getRow(row).height = 20;
-    ws.views = [{ rightToLeft: true, state: 'frozen', ySplit: headRow }];
+    ws.views = [{ rightToLeft: rtl, state: 'frozen', ySplit: headRow }];
     ws.pageSetup.printTitlesRow = headRow + ':' + headRow;
 
     // השורות
@@ -73,7 +79,7 @@
         const tickCol = TICK_COLS.includes(j + 1);
         cell.value = v || null;
         cell.font = tickCol ? CHECK_FONT : { name: FONT, bold: j === 4 };
-        cell.alignment = { horizontal: tickCol ? 'center' : 'right', vertical: 'middle', readingOrder: 'rtl' };
+        cell.alignment = { horizontal: tickCol ? 'center' : START, vertical: 'middle', readingOrder: order };
         cell.border = { bottom: thin, top: weekStart ? { style: 'medium', color: { argb: 'FF8A93A3' } } : thin };
         if (r.dow === 6) cell.fill = fill(SHABBAT_FILL);
       });
@@ -82,7 +88,8 @@
         if (!text) return;
         ws.getCell(row, col).dataValidation = {
           type: 'list', allowBlank: true, formulae: ['"' + CHECK + '"'],
-          showErrorMessage: true, errorTitle: 'נלמד', error: 'אפשר רק לבחור ' + CHECK + ' מהרשימה, או להשאיר ריק',
+          showErrorMessage: true, errorTitle: head[6],
+          error: c.checkError || 'אפשר רק לבחור ' + CHECK + ' מהרשימה, או להשאיר ריק',
         };
       });
     });
@@ -91,17 +98,17 @@
     // סוף הלוח
     row++;
     if (c.end) banner(c.end, { size: 12, bold: true });
-    // שורה אחת: מימין "מוגש ע"י", משמאל הסבר הכוכבית
+    // שורה אחת: בצד ההתחלה (בעברית מימין) "מוגש ע"י", בצד השני הסבר הכוכבית
     row++;
     ws.mergeCells(row, 1, row, 4);
     ws.mergeCells(row, 5, row, COLS);
-    const right = ws.getCell(row, 1), left = ws.getCell(row, 5);
-    right.value = c.footer;
-    right.font = { name: FONT, bold: true, color: { argb: TECHELET } };
-    right.alignment = { horizontal: 'right', vertical: 'middle', readingOrder: 'rtl' };
-    left.value = c.note || null;
-    left.font = { name: FONT, size: 10 };
-    left.alignment = { horizontal: 'left', vertical: 'middle', readingOrder: 'rtl' };
+    const credit = ws.getCell(row, 1), note = ws.getCell(row, 5);
+    credit.value = c.footer;
+    credit.font = { name: FONT, bold: true, color: { argb: TECHELET } };
+    credit.alignment = { horizontal: START, vertical: 'middle', readingOrder: order };
+    note.value = c.note || null;
+    note.font = { name: FONT, size: 10 };
+    note.alignment = { horizontal: END, vertical: 'middle', readingOrder: order };
 
     return wb;
   }

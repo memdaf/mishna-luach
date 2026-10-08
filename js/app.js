@@ -2,14 +2,11 @@
 (function () {
   'use strict';
 
-  const E = window.createLuachEngine(window.hebcal, window.LUACH_DATA);
-  const { HDate } = E;
   const $ = id => document.getElementById(id);
 
-  const FOOTER = 'מוגש ע"י "מפעל החק - משנה לחק"';
-  const STAR_NOTE = '* לימוד פרק החק של הפרשה המחוברת ולא משנה לחק';
   const FORM_KEY = 'mishna-luach-form';
   const TICKS_KEY = 'mishna-luach-ticks';
+  const LANG_KEY = 'mishna-luach-lang';
 
   const store = {
     get(k, def) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch (e) { return def; } },
@@ -17,11 +14,43 @@
   };
   let ticks = store.get(TICKS_KEY, {});
 
+  // ---- שפה ----
+  // ?lang=en בכתובת קובע. אחרת השפה שנבחרה בפעם הקודמת, ואם אין - עברית.
+  // החלפת שפה טוענת את הדף מחדש עם ?lang=..., והטופס חוזר מהאחסון.
+  const urlLang = new URLSearchParams(location.search).get('lang');
+  const lang = urlLang === 'en' || urlLang === 'he' ? urlLang : (store.get(LANG_KEY, 'he') === 'en' ? 'en' : 'he');
+  if (urlLang === lang) store.set(LANG_KEY, lang);
+  const STR = window.LuachI18n[lang];
+  const t = (key, ...args) => {
+    const v = key in STR ? STR[key] : window.LuachI18n.he[key];
+    return typeof v === 'function' ? v(...args) : v;
+  };
+  function applyLanguage() {
+    const root = document.documentElement;
+    root.lang = lang;
+    root.dir = lang === 'en' ? 'ltr' : 'rtl';
+    document.title = t('title');
+    if (lang === 'en') {
+      document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+      document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+    }
+    const other = lang === 'en' ? 'he' : 'en';
+    const link = $('langToggle');
+    link.textContent = t('langOther');
+    link.lang = other;
+    link.href = '?lang=' + other;
+    link.addEventListener('click', () => store.set(LANG_KEY, other));
+  }
+  applyLanguage();
+
+  const E = window.createLuachEngine(window.hebcal, window.LUACH_DATA, lang);
+  const { HDate } = E;
+
   // ---- תאריכים ----
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const toInput = d => E.isoDate(d);
   const fromInput = s => { if (!s) return null; const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
-  const fmt = d => E.isoDate(d).split('-').reverse().join('/');
+  const fmt = d => E.gregDate(d);
   const addDays = (d, n) => { const r = new Date(d); r.setDate(r.getDate() + n); return r; };
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -93,13 +122,17 @@
   // ---- הזנת תאריך עברי ----
   // שדה התאריך הלועזי נשאר המקור. שלושת שדות התאריך העברי (יום, חודש, שנה) כותבים אליו וקוראים ממנו.
   // אפשר לבחור מהרשימה או להקליד: "יב" / "י"ב" / "12", "חשון" / "מרחשוון", "תשפ"ז" / "ה'תשפ"ז" / "פז" / "5787".
+  // באנגלית: "12", "Cheshvan" / "Heshvan", "Adar II" / "Adar 2", "5787" / "87".
   const DATE_FIELDS = ['fromDate', 'toDate', 'deathDate'];
   const pickers = {};
-  const norm = s => String(s || '').replace(/["'׳״\s-]/g, '');
+  const norm = s => String(s || '').replace(/["'׳״’\s-]/g, '').toLowerCase();
   const MONTH_ALIASES = {
     'תשרי': 7, 'חשון': 8, 'חשוון': 8, 'מרחשון': 8, 'מרחשוון': 8, 'כסלו': 9, 'כסליו': 9, 'טבת': 10, 'שבט': 11,
     'אדרא': 12, 'אדרראשון': 12, 'אדרב': 13, 'אדרשני': 13, 'ניסן': 1, 'אייר': 2, 'איר': 2, 'סיון': 3, 'סיוון': 3,
     'תמוז': 4, 'אב': 5, 'מנחםאב': 5, 'אלול': 6,
+    tishrei: 7, tishri: 7, cheshvan: 8, heshvan: 8, marcheshvan: 8, kislev: 9, teves: 10, tevet: 10, tevais: 10,
+    shvat: 11, shevat: 11, adari: 12, adar1: 12, adarii: 13, adar2: 13, nisan: 1, nissan: 1, iyyar: 2, iyar: 2,
+    sivan: 3, tamuz: 4, tammuz: 4, av: 5, menachemav: 5, elul: 6,
   };
 
   function monthOrder(y) {
@@ -125,7 +158,7 @@
   function parseMonth(text, y) {
     const t = norm(text);
     if (!t) return 0;
-    if (t === 'אדר') return HDate.isLeapYear(y) ? 13 : 12;
+    if (t === 'אדר' || t === 'adar') return HDate.isLeapYear(y) ? 13 : 12;
     let m = MONTH_ALIASES[t];
     if (m === 13 && !HDate.isLeapYear(y)) m = 12;
     return m || NaN;
@@ -136,7 +169,7 @@
     texts.forEach(t => sel.add(new Option(t, t)));
   }
   function fillMonths(p, y) {
-    fillList(p.ml, 'חודש', monthOrder(y).map(m => E.monthName(m, y)));
+    fillList(p.ml, t('pickMonth'), monthOrder(y).map(m => E.monthName(m, y)));
   }
   // כל חלק בתאריך הוא שדה כתיבה שמונח על רשימת בחירה: כותבים בשדה, או פותחים את הרשימה בחץ
   function buildPicker(id) {
@@ -150,7 +183,7 @@
       sel.id = id + '-' + suffix + '-list';
       sel.dataset.hebsel = id;
       sel.tabIndex = -1;
-      sel.setAttribute('aria-label', label + ' - רשימה');
+      sel.setAttribute('aria-label', label + t('pickList'));
       const inp = document.createElement('input');
       inp.type = 'text';
       inp.id = id + '-' + suffix;
@@ -163,16 +196,16 @@
       box.append(combo);
       return [inp, sel];
     };
-    const [d, dl] = mk('d', 'יום', 'hd');
-    const [m, ml] = mk('m', 'חודש', 'hm');
-    const [y, yl] = mk('y', 'שנה', 'hy');
+    const [d, dl] = mk('d', t('pickDay'), 'hd');
+    const [m, ml] = mk('m', t('pickMonth'), 'hm');
+    const [y, yl] = mk('y', t('pickYear'), 'hy');
     const days = [];
     for (let i = 1; i <= 30; i++) days.push(E.num(i));
-    fillList(dl, 'יום', days);
+    fillList(dl, t('pickDay'), days);
     const years = [];
     if (id === 'deathDate') for (let i = hebYearNow; i >= hebYearNow - 100; i--) years.push(i);
     else for (let i = hebYearNow - 2; i <= hebYearNow + 6; i++) years.push(i);
-    fillList(yl, 'שנה', years.map(E.yearName));
+    fillList(yl, t('pickYear'), years.map(E.yearName));
     const p = { d, m, y, ml, box, optional: id === 'deathDate' };
     fillMonths(p, hebYearNow);
     $(id).insertAdjacentElement('afterend', box);
@@ -237,28 +270,28 @@
     if (mode === 'annual') {
       const y = +$('cycleYear').value;
       ({ from, to } = E.cycleRange(y, 1));
-      title = 'לוח משנה לחק - שנתי - ' + E.yearName(y);
+      title = t('titleAnnual', E.yearName(y));
     } else if (mode === 'two') {
       const y = +$('twoStart').value;
       ({ from, to } = E.cycleRange(y, 2));
-      title = 'לוח משנה לחק - דו שנתי - ' + E.yearName(y) + '-' + E.yearName(y + 1);
+      title = t('titleTwo', E.yearName(y), E.yearName(y + 1));
     } else if (mode === 'yahrzeit') {
       // מהיארצייט (כולל) ועד יום לפני היארצייט של השנה הבאה
       const d = fromInput($('deathDate').value), y = +$('yzYear').value;
-      if (!d || !y) return showEmpty('יש להזין את תאריך הפטירה.');
+      if (!d || !y) return showEmpty(t('msgNoDeath'));
       from = E.yahrzeitIn(d, y, adarII());
       yahrzeit = E.yahrzeitIn(d, y + 1, adarII());
       to = yahrzeit.prev();
-      title = 'לוח משניות שנתי - לסיים עד ' + E.hebDate(to);
+      title = t('titleUntil', E.hebDate(to));
     } else {
-      const f = fromInput($('fromDate').value), t = fromInput($('toDate').value);
-      if (!f || !t || t < f) return showEmpty('יש לבחור תאריך התחלה ותאריך סיום שאחריו.');
-      from = new HDate(f); to = new HDate(t);
-      if (to.abs() - from.abs() > 3 * 385) return showEmpty('הטווח ארוך מדי. אפשר לבנות לוח של עד 3 שנים.');
+      const f = fromInput($('fromDate').value), e = fromInput($('toDate').value);
+      if (!f || !e || e < f) return showEmpty(t('msgRange'));
+      from = new HDate(f); to = new HDate(e);
+      if (to.abs() - from.abs() > 3 * 385) return showEmpty(t('msgTooLong'));
       const heb = $('hebInput').checked;
       $('fromHeb').textContent = heb ? fmt(f) : E.hebDate(from);
-      $('toHeb').textContent = heb ? fmt(t) : E.hebDate(to);
-      title = 'לוח משניות שנתי - לסיים עד ' + E.hebDate(to);
+      $('toHeb').textContent = heb ? fmt(e) : E.hebDate(to);
+      title = t('titleUntil', E.hebDate(to));
     }
 
     const res = E.buildRows({
@@ -270,13 +303,16 @@
     const name = mode === 'range' || mode === 'yahrzeit' ? $('niftar').value.trim() : '';
     current = {
       mode, il, rows: res.rows, title,
-      dedication: name ? 'נא לומר לפני הלימוד: לט"נ ' + name : '',
-      note: res.hasStar ? STAR_NOTE : '',
-      end: mode === 'yahrzeit' && name
-        ? 'יארצייט של ' + name + (yahrzeit ? ' - ' + E.hebDate(yahrzeit) : '')
-        : '',
-      footer: FOOTER,
-      kind: mode === 'two' ? 'לוח משנה לחק - דו שנתי' : 'לוח משנה לחק - שנתי',
+      dedication: name ? t('dedication', name) : '',
+      note: res.hasStar ? t('starNote') : '',
+      end: mode === 'yahrzeit' && name ? t('end', name, yahrzeit ? E.hebDate(yahrzeit) : '') : '',
+      footer: t('footer'),
+      kind: mode === 'two' ? t('kindTwo') : t('kindAnnual'),
+      // בשביל Excel
+      rtl: lang !== 'en',
+      head: t('head'),
+      sheetName: t('sheetName'),
+      checkError: t('excelCheckError'),
     };
     render();
   }
@@ -285,8 +321,9 @@
   // הדפים נחתכים כאן ולא ע"י הדפדפן, כדי שבכל דף תהיה שורה תחתונה כמו בדלפי:
   // מימין "מוגש ע"י", באמצע סוג הלוח, ומשמאל הסבר הכוכבית - רק בדף שיש בו כוכבית.
   // השורות בגובה קבוע, ולכן מספר השורות בדף ידוע מראש (בדף הראשון פחות, בגלל הכותרת).
-  // שורה = 5 מ"מ. נמדד: בדף מלא נשארים כ-6 מ"מ פנויים מעל השורה התחתונה
-  const ROWS_PER_PAGE = 51, ROWS_FIRST_PAGE = 49, ROWS_FIRST_PAGE_DEDICATION = 47;
+  // שורה = 5 מ"מ, אבל הקווים בין השבועות מוסיפים קצת, ומשתנים מדף לדף.
+  // נמדד בעברית ובאנגלית: עם המספרים האלה נשארים לפחות כ-8 מ"מ פנויים מעל השורה התחתונה
+  const ROWS_PER_PAGE = 50, ROWS_FIRST_PAGE = 48, ROWS_FIRST_PAGE_DEDICATION = 46;
 
   function buildPrint() {
     const c = current;
@@ -305,8 +342,7 @@
     };
     const head = '<colgroup><col class="w-greg"><col class="w-heb"><col class="w-chag"><col class="w-day"><col class="w-parsha">' +
       '<col class="w-chok"><col class="w-tick"><col class="w-hash"><col class="w-tick"></colgroup>' +
-      '<thead><tr><th>תאריך</th><th>תאריך עברי</th><th>חג</th><th>יום</th><th>פרשה</th>' +
-      '<th>לימוד החק</th><th></th><th>משנה לחק</th><th></th></tr></thead>';
+      '<thead><tr>' + c.head.map((h, i) => '<th>' + (i === 6 || i === 8 ? '' : esc(h)) + '</th>').join('') + '</tr></thead>';
 
     area.innerHTML = pages.map((rows, pi) => {
       const hasStar = rows.some(r => r.star);
@@ -330,7 +366,7 @@
         '<table class="ptable">' + head + '<tbody>' + body + '</tbody></table>' +
         (last && c.end ? '<p class="p-end">' + esc(c.end) + '</p>' : '') +
         '<footer class="pfoot"><span>' + esc(c.footer) + '</span><span class="p-kind">' + esc(c.kind) +
-        '<span class="p-num">דף ' + (pi + 1) + ' מתוך ' + pages.length + '</span></span><span>' + (hasStar ? esc(STAR_NOTE) : '') + '</span></footer>' +
+        '<span class="p-num">' + esc(t('page', pi + 1, pages.length)) + '</span></span><span>' + (hasStar ? esc(c.note) : '') + '</span></footer>' +
         '</section>';
     }).join('');
   }
@@ -344,7 +380,8 @@
     $('btnToday').hidden = true;
   }
 
-  function tickKey(r, col) { return r.iso + '|' + col + '|' + (col === 1 ? r.limud1 : r.limud2); }
+  // המפתח לפי הטקסט העברי המקורי, כך שסימון "נלמד" נשמר גם כשמחליפים שפה
+  function tickKey(r, col) { return r.iso + '|' + col + '|' + (col === 1 ? r.raw1 : r.raw2); }
 
   function render() {
     const c = current;
@@ -366,7 +403,7 @@
         const text = col === 1 ? r.limud1 : r.limud2;
         if (!text) return '<td class="c-tick"></td>';
         const k = tickKey(r, col);
-        return '<td class="c-tick"><input type="checkbox" class="tick" aria-label="נלמד" data-k="' + esc(k) + '"' +
+        return '<td class="c-tick"><input type="checkbox" class="tick" aria-label="' + esc(t('done')) + '" data-k="' + esc(k) + '"' +
           (ticks[k] ? ' checked' : '') + '></td>';
       };
       html += '<tr' + (cls.length ? ' class="' + cls.join(' ') + '"' : '') +
@@ -383,8 +420,8 @@
     $('rows').innerHTML = html;
 
     const first = c.rows[0], last = c.rows[c.rows.length - 1];
-    $('summary').innerHTML = '<strong>' + c.rows.length + '</strong> ימים, מ-' + esc(first.heb) + ' (' + first.greg + ') עד ' +
-      esc(last.heb) + ' (' + last.greg + '), ' + (c.il ? 'ארץ ישראל' : 'חוץ לארץ');
+    $('summary').innerHTML = t('summary', c.rows.length,
+      esc(first.heb) + ' (' + first.greg + ')', esc(last.heb) + ' (' + last.greg + ')', t(c.il ? 'placeIl' : 'placeChul'));
     $('btnToday').hidden = !c.rows.some(r => r.iso === todayIso);
   }
 
@@ -431,7 +468,7 @@
     if (!c) return;
     const fileName = c.title.replace(/["\/\\:*?<>|]/g, '').replace(/\s+/g, '_') + '.xlsx';
     window.LuachExcel.downloadExcel(window.ExcelJS, c, (r, col) => !!ticks[tickKey(r, col)], fileName)
-      .catch(err => { $('summary').textContent = 'הייצוא ל-Excel נכשל: ' + err.message; });
+      .catch(err => { $('summary').textContent = t('excelFail') + err.message; });
   });
 
   restoreForm();
