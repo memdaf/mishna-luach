@@ -403,8 +403,9 @@
       '<footer class="pfoot"><span>' + esc(c.footer) + '</span><span class="p-kind"></span><span></span></footer>' +
       '</section>';
   }
-  // שם הקובץ (בלי סיומת), זהה ל-Excel ול-PDF: הכותרת בלי תווים אסורים, ורווחים כקו תחתון
-  const fileBase = c => c.title.replace(/["\/\\:*?<>|]/g, '').replace(/\s+/g, '_');
+  // שם הקובץ (בלי סיומת), זהה ל-Excel ול-PDF: הכותרת עם הרווחים. גרשיים (אסורים בשם קובץ) הופכים
+  // לשני גרשים בודדים: תשפ"ז -> תשפ''ז. שאר התווים האסורים ב-Windows יורדים
+  const fileBase = c => c.title.replace(/"/g, "''").replace(/[\/\\:*?<>|]/g, '').replace(/\s+/g, ' ').trim();
 
   // ב"שמירה כ-PDF" הדפדפן מציע את כותרת הדף כשם הקובץ. בזמן ההדפסה הכותרת היא שם הקובץ
   window.addEventListener('beforeprint', () => {
