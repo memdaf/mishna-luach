@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Assistant:wght@400;600;700&display=swap">
-<link rel="stylesheet" href="css/style.css?v=4">
+<link rel="stylesheet" href="css/style.css?v=5">
 </head>
 <body>
 <!-- הטקסטים בעברית כתובים כאן. באנגלית הם מוחלפים לפי data-i18n (המילון ב-js/i18n.js) -->
@@ -29,10 +29,21 @@
         <label><input type="radio" name="mode" id="mode-two" value="two"><span data-i18n="modeTwo">דו שנתי</span></label>
         <label><input type="radio" name="mode" id="mode-range" value="range"><span data-i18n="modeRange">מתאריך עד תאריך</span></label>
         <label><input type="radio" name="mode" id="mode-yahrzeit" value="yahrzeit"><span data-i18n="modeYahrzeit">לוח יארצייט</span></label>
+        <label><input type="radio" name="mode" id="mode-cross" value="cross"><span data-i18n="modeCross">דוח מוצלב</span></label>
       </div>
     </fieldset>
 
-    <fieldset class="field">
+    <div class="field" data-for="cross">
+      <label for="crossKind" data-i18n="crossKind">דוח</label>
+      <select id="crossKind">
+        <option value="annual" data-i18n="crossAnnual">שנתי</option>
+        <option value="two-1" data-i18n="crossTwo1">דו שנתי - שנה א'</option>
+        <option value="two-2" data-i18n="crossTwo2">דו שנתי - שנה ב'</option>
+      </select>
+      <small class="hint" data-i18n="crossHint">לימוד המשנה לחק של כל פרשה לפי ימי השבוע</small>
+    </div>
+
+    <fieldset class="field" data-for="annual two range yahrzeit">
       <legend data-i18n="legendPlace">מקום</legend>
       <div class="seg" role="radiogroup">
         <label><input type="radio" name="place" id="place-il" value="il" checked><span data-i18n="placeIl">ארץ ישראל</span></label>
@@ -101,7 +112,11 @@
       <p id="sheetDedication" class="dedication"></p>
     </header>
     <div class="table-scroll">
-      <table class="luach">
+      <table class="luach cross" id="crossTable" hidden>
+        <thead><tr id="crossHead"></tr></thead>
+        <tbody id="crossRows"></tbody>
+      </table>
+      <table class="luach" id="luachTable">
         <thead>
           <tr>
             <th data-i18n="thDate">תאריך</th>
@@ -130,12 +145,12 @@
 
 </div>
 
-<script src="lib/hebcal.min.js?v=4"></script>
-<script src="lib/exceljs.min.js?v=4"></script>
-<script src="data/luach_data.js?v=4"></script>
-<script src="js/i18n.js?v=4"></script>
-<script src="js/engine.js?v=4"></script>
-<script src="js/excel.js?v=4"></script>
-<script src="js/app.js?v=4"></script>
+<script src="lib/hebcal.min.js?v=5"></script>
+<script src="lib/exceljs.min.js?v=5"></script>
+<script src="data/luach_data.js?v=5"></script>
+<script src="js/i18n.js?v=5"></script>
+<script src="js/engine.js?v=5"></script>
+<script src="js/excel.js?v=5"></script>
+<script src="js/app.js?v=5"></script>
 </body>
 </html>

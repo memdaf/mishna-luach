@@ -88,6 +88,7 @@
     $('toDate').value = s.toDate || toInput(addDays(new Date(today.getFullYear() + 1, today.getMonth(), today.getDate()), -1));
     $('niftar').value = s.niftar || '';
     $(s.adar === '2' ? 'adar-2' : 'adar-1').checked = true;
+    if (s.crossKind && $('crossKind').querySelector('option[value="' + s.crossKind + '"]')) $('crossKind').value = s.crossKind;
     fillYzYears(s.yzYear);
   }
   function saveForm() {
@@ -97,6 +98,7 @@
       deathDate: $('deathDate').value, hebInput: $('hebInput').checked,
       fromDate: $('fromDate').value, toDate: $('toDate').value,
       niftar: $('niftar').value, yzYear: $('yzYear').value, adar: radio('adar'),
+      crossKind: $('crossKind').value,
     });
   }
 
@@ -265,6 +267,7 @@
     const il = radio('place') === 'il';
     document.querySelectorAll('[data-for]').forEach(el => { el.hidden = !el.dataset.for.split(' ').includes(mode); });
     yahrzeit = null;
+    if (mode === 'cross') return computeCross();
 
     let from, to, title;
     if (mode === 'annual') {
@@ -317,6 +320,23 @@
     render();
   }
 
+  // דוח מוצלב: שורה לכל פרשה, עמודה לכל יום (כמו "הצלבה" בדלפי)
+  // בכל תא שתי שורות: תחילת ההשלמה, ומתחתיה הסוף
+  const crossCell = s => esc(s).replace(/ (-|–) /, ' $1<br>');
+  function computeCross() {
+    const kind = $('crossKind').value;
+    const title = t('titleCross', t('crossNames')[kind]);
+    current = {
+      mode: 'cross', cross: true, rows: E.crossRows(kind), title,
+      dedication: '', note: '', end: '',
+      footer: t('footer'), kind: title,
+      rtl: lang !== 'en',
+      head: [t('head')[4]].concat(E.DAY_NAMES),
+      sheetName: t('sheetNameCross'),
+    };
+    render();
+  }
+
   // ---- הדפסה ----
   // הדפים נחתכים כאן ולא ע"י הדפדפן, כדי שבכל דף תהיה שורה תחתונה כמו בדלפי:
   // מימין "מוגש ע"י", באמצע סוג הלוח, ומשמאל הסבר הכוכבית - רק בדף שיש בו כוכבית.
@@ -329,6 +349,7 @@
     const c = current;
     const area = $('printArea');
     if (!c) { area.innerHTML = ''; return; }
+    if (c.cross) return buildCrossPrint(c, area);
     const first = c.dedication ? ROWS_FIRST_PAGE_DEDICATION : ROWS_FIRST_PAGE;
     const pages = [c.rows.slice(0, first)];
     for (let i = first; i < c.rows.length; i += ROWS_PER_PAGE) pages.push(c.rows.slice(i, i + ROWS_PER_PAGE));
@@ -370,11 +391,24 @@
         '</section>';
     }).join('');
   }
+  // הדוח המוצלב בדף אחד. כל תא בשתי שורות: תחילת ההשלמה, ומתחתיה הסוף
+  function buildCrossPrint(c, area) {
+    area.innerHTML = '<section class="ppage pcross">' +
+      '<h2 class="p-title">' + esc(c.title) + '</h2>' +
+      '<table class="ptable xtable"><colgroup><col class="w-xparsha">' + '<col>'.repeat(7) + '</colgroup>' +
+      '<thead><tr>' + c.head.map(h => '<th>' + esc(h) + '</th>').join('') + '</tr></thead><tbody>' +
+      c.rows.map(r => '<tr><th scope="row">' + esc(r.parsha) + '</th>' +
+        r.cells.map(x => '<td>' + crossCell(x) + '</td>').join('') + '</tr>').join('') +
+      '</tbody></table>' +
+      '<footer class="pfoot"><span>' + esc(c.footer) + '</span><span class="p-kind"></span><span></span></footer>' +
+      '</section>';
+  }
   window.addEventListener('beforeprint', buildPrint);
 
   function showEmpty(msg) {
     current = null;
     $('rows').innerHTML = '';
+    $('crossRows').innerHTML = '';
     ['sheetTitle', 'sheetDedication', 'sheetNote', 'sheetEnd', 'sheetFooter'].forEach(id => { $(id).textContent = ''; });
     $('summary').textContent = msg;
     $('btnToday').hidden = true;
@@ -391,6 +425,18 @@
     $('sheetEnd').textContent = c.end;
     $('sheetFooter').textContent = c.footer;
     document.title = c.title;
+    $('crossTable').hidden = !c.cross;
+    $('luachTable').hidden = !!c.cross;
+    if (c.cross) {
+      $('rows').innerHTML = '';
+      $('crossHead').innerHTML = c.head.map(h => '<th>' + esc(h) + '</th>').join('');
+      $('crossRows').innerHTML = c.rows.map(r => '<tr><th scope="row" class="c-parsha">' + esc(r.parsha) + '</th>' +
+        r.cells.map(x => '<td class="c-limud">' + crossCell(x) + '</td>').join('') + '</tr>').join('');
+      $('summary').innerHTML = t('crossSummary', c.rows.length);
+      $('btnToday').hidden = true;
+      return;
+    }
+    $('crossRows').innerHTML = '';
 
     const todayIso = E.isoDate(today);
     let html = '';

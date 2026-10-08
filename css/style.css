@@ -238,6 +238,13 @@ table.luach {
 .luach tr.shabbat td { background: var(--shabbat); }
 .luach tr.shabbat td.c-day { font-weight: 700; color: var(--techelet); }
 .luach tr.today td { background: var(--today); }
+/* דוח מוצלב: שורה לכל פרשה, עמודה לכל יום */
+.luach.cross th[scope="row"] {
+  position: static; background: none; border-bottom: 1px solid var(--line);
+  font-size: 0.92rem; font-weight: 700; padding: 5px 8px; vertical-align: top;
+}
+.luach.cross td.c-limud { white-space: nowrap; }
+.luach.cross td:last-child { background: var(--shabbat); }
 .chag {
   display: inline-block;
   font-size: 0.8rem;
@@ -308,6 +315,19 @@ html { scroll-behavior: smooth; }
   .ptable td.p-wrap div { max-height: 4.6mm; overflow: hidden; white-space: normal; font-size: 6.8pt; line-height: 1.05; }
   .ptable td.p-parsha div { font-weight: 700; font-size: 7.5pt; }
   .ptable td.p-tick { text-align: center; font-size: 10pt; }
+
+  /* דוח מוצלב בדף אחד: כל תא בשתי שורות */
+  .xtable .w-xparsha { width: 9%; }
+  .xtable th { text-align: center; }
+  .xtable tbody th {
+    background: none; border-bottom: 0.4pt solid var(--line); border-inline-end: 0.6pt solid var(--line);
+    font-size: 7.5pt; text-align: start; white-space: normal; padding: 0 1mm;
+  }
+  .xtable td {
+    height: auto; padding: 0.35mm 1mm; font-size: 6.6pt; line-height: 1.06;
+    white-space: nowrap; border-inline-end: 0.4pt solid var(--line);
+  }
+  .xtable td:last-child { background: var(--shabbat); }
 
   .pfoot {
     position: absolute; bottom: 0; left: 0; right: 0;

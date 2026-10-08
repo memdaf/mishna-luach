@@ -314,6 +314,24 @@
       return { rows, hasStar };
     }
 
+    // דוח מוצלב, כמו qryCross / qryCross31 / qryCross32 בדלפי: שורה לכל פרשה, עמודה לכל יום,
+    // ובכל תא לימוד ההשלמה. רק פרשות שיש בהן השלמה.
+    // kind: 'annual' | 'two-1' (דו שנתי שנה א') | 'two-2' (שנה ב')
+    function crossRows(kind) {
+      const src = kind === 'annual' ? data.annual
+        : data.two_year.filter(r => r.year === (kind === 'two-1' ? 'א' : 'ב'));
+      const byCode = new Map();
+      src.forEach(r => {
+        if (!r.hashlama) return;
+        if (!byCode.has(r.parsha_code)) byCode.set(r.parsha_code, new Array(7).fill(''));
+        byCode.get(r.parsha_code)[DAY_LETTERS.indexOf(r.day)] = r.hashlama;
+      });
+      return [...byCode.keys()].sort((a, b) => a - b).map(code => ({
+        code, parsha: parshaName(code),
+        raw: byCode.get(code), cells: byCode.get(code).map(limudText),
+      }));
+    }
+
     // יום היארצייט בשנה עברית נתונה (כולל כללי אדר וחשון/כסלו). null אם השנה אינה אחרי שנת הפטירה
     // adarII: מי שנפטר באדר של שנה פשוטה - בשנה מעוברת היארצייט באדר ב' (המחבר) ולא באדר א' (הרמ"א, ברירת המחדל של Hebcal)
     function yahrzeitIn(deathDate, hyear, adarII) {
@@ -333,7 +351,7 @@
     function isoDate(g) { return g.getFullYear() + '-' + pad(g.getMonth() + 1) + '-' + pad(g.getDate()); }
 
     return {
-      HDate, buildRows, cycleRange, cycleYearOf, yahrzeitIn, diedInPlainAdar, hebDate, yearName, num, monthName,
+      HDate, buildRows, crossRows, cycleRange, cycleYearOf, yahrzeitIn, diedInPlainAdar, hebDate, yearName, num, monthName,
       isoDate, gregDate, week, parshaName, limudText, DAY_NAMES, lang: EN ? 'en' : 'he',
     };
   }

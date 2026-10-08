@@ -20,6 +20,7 @@
 
   // c: הלוח הנוכחי (current מ-app.js). ticked(r, col): האם סומן "נלמד"
   function buildExcel(ExcelJS, c, ticked) {
+    if (c.cross) return buildCrossExcel(ExcelJS, c);
     const rtl = c.rtl !== false;
     const START = rtl ? 'right' : 'left', END = rtl ? 'left' : 'right';
     const order = rtl ? 'rtl' : 'ltr';
@@ -110,6 +111,59 @@
     note.font = { name: FONT, size: 10 };
     note.alignment = { horizontal: END, vertical: 'middle', readingOrder: order };
 
+    return wb;
+  }
+
+  // דוח מוצלב: עמודת פרשה ו-7 עמודות של ימים, לרוחב הדף ובדף אחד
+  function buildCrossExcel(ExcelJS, c) {
+    const rtl = c.rtl !== false;
+    const START = rtl ? 'right' : 'left';
+    const order = rtl ? 'rtl' : 'ltr';
+    const cols = c.head.length;
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet(c.sheetName, {
+      views: [{ rightToLeft: rtl }],
+      pageSetup: { paperSize: 9, orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 1 },
+    });
+    ws.columns = [14].concat(new Array(7).fill(30)).map(width => ({ width }));
+
+    ws.mergeCells(1, 1, 1, cols);
+    const title = ws.getCell(1, 1);
+    title.value = c.title;
+    title.font = { name: FONT, size: 22, bold: true, color: { argb: TECHELET } };
+    title.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: order };
+    ws.getRow(1).height = 36;
+
+    const headRow = 3;
+    c.head.forEach((h, i) => {
+      const cell = ws.getCell(headRow, i + 1);
+      cell.value = h;
+      cell.font = { name: FONT, bold: true };
+      cell.fill = fill(HEAD_FILL);
+      cell.alignment = { horizontal: 'center', vertical: 'middle', readingOrder: order };
+      cell.border = { bottom: { style: 'medium', color: { argb: TECHELET } } };
+    });
+    ws.getRow(headRow).height = 20;
+    ws.views = [{ rightToLeft: rtl, state: 'frozen', ySplit: headRow, xSplit: 1 }];
+
+    c.rows.forEach((r, i) => {
+      const row = headRow + 1 + i;
+      [r.parsha].concat(r.cells).forEach((v, j) => {
+        const cell = ws.getCell(row, j + 1);
+        cell.value = v || null;
+        cell.font = { name: FONT, bold: j === 0 };
+        cell.alignment = { horizontal: START, vertical: 'middle', wrapText: true, readingOrder: order };
+        cell.border = { top: thin, bottom: thin, left: thin, right: thin };
+        if (j === 7) cell.fill = fill(SHABBAT_FILL);
+      });
+    });
+
+    const last = headRow + c.rows.length + 2;
+    ws.mergeCells(last, 1, last, cols);
+    const credit = ws.getCell(last, 1);
+    credit.value = c.footer;
+    credit.font = { name: FONT, bold: true, color: { argb: TECHELET } };
+    credit.alignment = { horizontal: START, vertical: 'middle', readingOrder: order };
     return wb;
   }
 

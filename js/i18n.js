@@ -31,6 +31,12 @@
     done: 'נלמד',
     head: ['תאריך', 'תאריך עברי', 'חג', 'יום', 'פרשה', 'לימוד החק', 'נלמד', 'משנה לחק', 'נלמד'],
     sheetName: 'לוח',
+
+    // דוח מוצלב (כמו "הצלבה" בדלפי)
+    crossNames: { annual: 'שנתי', 'two-1': 'דו שנתי שנה א', 'two-2': 'דו שנתי שנה ב' },
+    titleCross: k => 'השלמת משניות לחק - ' + k + ' בדף אחד',
+    crossSummary: n => '<strong>' + n + '</strong> פרשות שיש בהן השלמת משניות',
+    sheetNameCross: 'דוח מוצלב',
   };
 
   const en = {
@@ -91,6 +97,17 @@
     done: 'Done',
     head: ['Date', 'Hebrew date', 'Holiday', 'Day', 'Parsha', 'Chok', 'Done', 'Mishna LeChok', 'Done'],
     sheetName: 'Calendar',
+
+    modeCross: 'Cross table',
+    crossKind: 'Table',
+    crossAnnual: 'Annual',
+    crossTwo1: 'Two-year, Year 1',
+    crossTwo2: 'Two-year, Year 2',
+    crossHint: 'The Mishna LeChok of each parsha, by day of the week',
+    crossNames: { annual: 'Annual', 'two-1': 'Two-Year, Year 1', 'two-2': 'Two-Year, Year 2' },
+    titleCross: k => 'Mishna LeChok - ' + k + ' - on One Page',
+    crossSummary: n => '<strong>' + n + '</strong> parshiyos with Mishna LeChok',
+    sheetNameCross: 'Cross table',
   };
 
   root.LuachI18n = { he, en };
