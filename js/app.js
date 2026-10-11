@@ -449,10 +449,15 @@
     if (c.cross) {
       $('rows').innerHTML = '';
       $('crossHead').innerHTML = c.head.map(h => '<th>' + esc(h) + '</th>').join('');
+      // התא של היום: פרשת השבת הקרובה (לפי סדר ארץ ישראל, כמו הלימוד) ויום השבוע של היום
+      const w = E.week(new HDate(today).onOrAfter(6), true);
+      const todayCode = w.codes.length === 1 ? w.codes[0] : 0, todayDow = today.getDay();
       $('crossRows').innerHTML = c.rows.map(r => '<tr><th scope="row" class="c-parsha">' + esc(r.parsha) + '</th>' +
-        r.cells.map(x => '<td class="c-limud">' + crossCell(x) + '</td>').join('') + '</tr>').join('');
+        r.cells.map((x, i) => r.code === todayCode && i === todayDow && x
+          ? '<td class="c-limud today" id="today-row">' + crossCell(x) + '</td>'
+          : '<td class="c-limud">' + crossCell(x) + '</td>').join('') + '</tr>').join('');
       $('summary').innerHTML = t('crossSummary', c.rows.length);
-      $('btnToday').hidden = true;
+      $('btnToday').hidden = !$('today-row');
       return;
     }
     $('crossRows').innerHTML = '';

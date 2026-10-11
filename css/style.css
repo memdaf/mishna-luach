@@ -246,6 +246,7 @@ table.luach {
 }
 .luach.cross td.c-limud { white-space: nowrap; }
 .luach.cross td:last-child { background: var(--shabbat); }
+.luach.cross td.today { background: var(--today); outline: 2px solid var(--techelet); outline-offset: -2px; }
 .chag {
   display: inline-block;
   font-size: 0.8rem;
