@@ -64,6 +64,7 @@ body {
 .lede { margin: 0; color: var(--muted); }
 .masthead { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
 .masthead-text { min-width: 0; }
+.lang-nav { flex: none; display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 .lang-toggle {
   flex: none;
   font-weight: 600;

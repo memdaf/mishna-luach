@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Assistant:wght@400;600;700&display=swap">
-<link rel="stylesheet" href="css/style.css?v=8">
+<link rel="stylesheet" href="css/style.css?v=9">
 </head>
 <body>
 <!-- הטקסטים בעברית כתובים כאן. באנגלית הם מוחלפים לפי data-i18n (המילון ב-js/i18n.js) -->
@@ -18,7 +18,10 @@
       <h1 data-i18n="title">לוח משנה לחק</h1>
       <p class="lede" data-i18n="lede">בניית לוחות משנה לחק בשילוב פרקי המשניות של "חק לישראל", בכדי לסיים ששה סדרי משנה בשנה או בשנתיים, או לקראת יארצייט</p>
     </div>
-    <a id="langToggle" class="lang-toggle" href="?lang=en" lang="en">English</a>
+    <nav id="langNav" class="lang-nav" aria-label="Language">
+      <a class="lang-toggle" href="?lang=en" lang="en" data-lang="en">English</a>
+      <a class="lang-toggle" href="?lang=yi" lang="yi" data-lang="yi">אידיש</a>
+    </nav>
   </header>
 
   <form id="controls" class="controls" autocomplete="off">
@@ -145,12 +148,12 @@
 
 </div>
 
-<script src="lib/hebcal.min.js?v=8"></script>
-<script src="lib/exceljs.min.js?v=8"></script>
-<script src="data/luach_data.js?v=8"></script>
-<script src="js/i18n.js?v=8"></script>
-<script src="js/engine.js?v=8"></script>
-<script src="js/excel.js?v=8"></script>
-<script src="js/app.js?v=8"></script>
+<script src="lib/hebcal.min.js?v=9"></script>
+<script src="lib/exceljs.min.js?v=9"></script>
+<script src="data/luach_data.js?v=9"></script>
+<script src="js/i18n.js?v=9"></script>
+<script src="js/engine.js?v=9"></script>
+<script src="js/excel.js?v=9"></script>
+<script src="js/app.js?v=9"></script>
 </body>
 </html>

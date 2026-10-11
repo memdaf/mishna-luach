@@ -17,8 +17,12 @@
   // ---- שפה ----
   // ?lang=en בכתובת קובע. אחרת השפה שנבחרה בפעם הקודמת, ואם אין - עברית.
   // החלפת שפה טוענת את הדף מחדש עם ?lang=..., והטופס חוזר מהאחסון.
+  // אידיש (yi): רק התפריט וההודעות. הלוח עצמו (כותרות, חגים, הדפסה ו-Excel) נשאר בעברית,
+  // כי במילון של אידיש אין את המפתחות של הלוח, ו-t() לוקח אותם מהעברית.
+  const LANGS = { he: 'עברית', en: 'English', yi: 'אידיש' };
   const urlLang = new URLSearchParams(location.search).get('lang');
-  const lang = urlLang === 'en' || urlLang === 'he' ? urlLang : (store.get(LANG_KEY, 'he') === 'en' ? 'en' : 'he');
+  const storedLang = store.get(LANG_KEY, 'he');
+  const lang = urlLang in LANGS ? urlLang : (storedLang in LANGS ? storedLang : 'he');
   if (urlLang === lang) store.set(LANG_KEY, lang);
   const STR = window.LuachI18n[lang];
   const t = (key, ...args) => {
@@ -30,20 +34,26 @@
     root.lang = lang;
     root.dir = lang === 'en' ? 'ltr' : 'rtl';
     document.title = t('title');
-    if (lang === 'en') {
-      document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
-      document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+    if (lang !== 'he') {
+      // רק מפתח שקיים במילון של השפה. השאר נשאר כמו שכתוב ב-HTML (בעברית)
+      document.querySelectorAll('[data-i18n]').forEach(el => { if (el.dataset.i18n in STR) el.textContent = t(el.dataset.i18n); });
+      document.querySelectorAll('[data-i18n-ph]').forEach(el => { if (el.dataset.i18nPh in STR) el.placeholder = t(el.dataset.i18nPh); });
     }
-    const other = lang === 'en' ? 'he' : 'en';
-    const link = $('langToggle');
-    link.textContent = t('langOther');
-    link.lang = other;
-    link.href = '?lang=' + other;
-    link.addEventListener('click', () => store.set(LANG_KEY, other));
+    // קישורים לשתי השפות האחרות
+    $('langNav').innerHTML = '';
+    Object.keys(LANGS).filter(l => l !== lang).forEach(l => {
+      const a = document.createElement('a');
+      a.className = 'lang-toggle';
+      a.href = '?lang=' + l;
+      a.lang = l;
+      a.textContent = LANGS[l];
+      a.addEventListener('click', () => store.set(LANG_KEY, l));
+      $('langNav').append(a);
+    });
   }
   applyLanguage();
 
-  const E = window.createLuachEngine(window.hebcal, window.LUACH_DATA, lang);
+  const E = window.createLuachEngine(window.hebcal, window.LUACH_DATA, lang === 'en' ? 'en' : 'he'); // באידיש הלוח בעברית
   const { HDate } = E;
 
   // ---- תאריכים ----

@@ -6,7 +6,6 @@
 
   const he = {
     title: 'לוח משנה לחק',
-    langOther: 'English',
 
     // טקסטים שנבנים בזמן ריצה
     footer: 'מוגש ע"י "מפעל החק - משנה לחק"',
@@ -41,7 +40,6 @@
 
   const en = {
     title: 'Mishna LeChok Calendar',
-    langOther: 'עברית',
     lede: 'Build Mishna LeChok study calendars that combine the Mishnayos chapters of "Chok LeYisrael", to complete all six orders of Mishna in one year or two, or toward a yahrzeit',
     legendMode: 'Calendar type',
     modeAnnual: 'Annual',
@@ -110,5 +108,51 @@
     sheetNameCross: 'Cross table',
   };
 
-  root.LuachI18n = { he, en };
+  // אידיש (חסידיש, כתיב סאטמר: בלי סימנים של ייוואָ). רק התפריט וההודעות.
+  // הטקסטים של הלוח עצמו (כותרת, עמודות, לט"נ, "מוגש ע"י", הדפסה ו-Excel) לא כתובים כאן, ולכן הם בעברית.
+  const yi = {
+    lede: 'מאכן לוחות פון משנה לחק, צוזאמען מיט די פרקי משניות פון "חק לישראל", כדי צו ענדיגן די ששה סדרי משנה אין איין יאר אדער אין צוויי יאר, אדער אויפן יארצייט',
+    legendMode: 'סארט לוח',
+    modeAnnual: 'יערליך',
+    modeTwo: 'צוויי יעריג',
+    modeRange: 'פון תאריך ביז תאריך',
+    modeYahrzeit: 'יארצייט לוח',
+    modeCross: 'דוח מוצלב',
+    legendPlace: 'ארט',
+    placeIl: 'ארץ ישראל',
+    placeChul: 'חוץ לארץ',
+    cycleYear: 'לערן-יאר',
+    cycleHint: 'פון פרשת בראשית ביז וזאת הברכה',
+    twoStart: 'יאר א\' הייבט זיך אן',
+    twoHint: 'צוויי יאר, פון יאר א\' ביזן סוף פון יאר ב\'',
+    hebInput: 'אידישער תאריך',
+    fromDate: 'פון תאריך',
+    toDate: 'ביז תאריך',
+    deathDate: 'תאריך פון פטירה',
+    leapAdar: 'אין א שנה מעוברת:',
+    adar1: 'אדר א\'',
+    adar2: 'אדר ב\'',
+    yzYear: 'דער לוח הייבט זיך אן ביים יארצייט פון',
+    niftar: 'לעילוי נשמת (נישט קיין מוז)',
+    niftarPh: 'פלוני בן פלוני',
+    crossKind: 'דוח',
+    crossAnnual: 'יערליך',
+    crossTwo1: 'צוויי יעריג - יאר א\'',
+    crossTwo2: 'צוויי יעריג - יאר ב\'',
+    crossHint: 'די משנה לחק פון יעדע פרשה, לויט די טעג פון דער וואך',
+    btnToday: 'גיי צו היינט',
+    btnPrint: 'דרוקן / PDF',
+    previewNote: 'אינעם פארויסקוק קען מען נישט דרוקן און נישט ארויסגעבן צו Excel. דאס ארבעט ווען מען עפנט דעם וועבזייטל אליין.',
+
+    summary: (n, from, to, place) => '<strong>' + n + '</strong> טעג, פון ' + from + ' ביז ' + to + ', ' + place,
+    crossSummary: n => '<strong>' + n + '</strong> פרשיות מיט משנה לחק',
+    msgNoDeath: 'מען דארף אריינלייגן דעם תאריך פון פטירה.',
+    msgRange: 'מען דארף אויסקלייבן א תאריך פון אנהייב, און א שפעטערדיגן תאריך פון סוף.',
+    msgTooLong: 'די צייט איז צו לאנג. מען קען מאכן א לוח ביז 3 יאר.',
+    excelFail: 'ארויסגעבן צו Excel איז נישט געלונגען: ',
+    pickDay: 'טאג', pickMonth: 'חודש', pickYear: 'יאר', pickList: ' - רשימה',
+    done: 'געלערנט',
+  };
+
+  root.LuachI18n = { he, en, yi };
 })(typeof window !== 'undefined' ? window : globalThis);
