@@ -39,6 +39,8 @@
       document.querySelectorAll('[data-i18n]').forEach(el => { if (el.dataset.i18n in STR) el.textContent = t(el.dataset.i18n); });
       document.querySelectorAll('[data-i18n-ph]').forEach(el => { if (el.dataset.i18nPh in STR) el.placeholder = t(el.dataset.i18nPh); });
     }
+    // "אודות" ו"הוראות" בשפה הנוכחית: docs/about.pdf, docs/about-yi.pdf, docs/about-en.pdf
+    if (lang !== 'he') document.querySelectorAll('.doc-link').forEach(a => { a.href = 'docs/' + a.dataset.doc + '-' + lang + '.pdf'; });
     // קישורים לשתי השפות האחרות
     $('langNav').innerHTML = '';
     Object.keys(LANGS).filter(l => l !== lang).forEach(l => {
