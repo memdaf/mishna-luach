@@ -64,6 +64,21 @@ body {
 .lede { margin: 0; color: var(--muted); }
 .masthead { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
 .masthead-text { min-width: 0; }
+/* למעלה: "אודות" ו"הוראות" (קבצי PDF), קו מפריד, ואחריהם כפתורי השפה */
+.top-nav { flex: none; display: flex; gap: 8px 14px; flex-wrap: wrap; justify-content: flex-end; align-items: center; }
+.doc-nav { display: flex; gap: 8px; flex-wrap: wrap; padding-inline-end: 14px; border-inline-end: 1px solid var(--line); }
+.doc-link {
+  font-weight: 600;
+  color: var(--paper);
+  background: var(--techelet);
+  border: 1px solid var(--techelet);
+  border-radius: 6px;
+  padding: 5px 14px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.doc-link:hover { filter: brightness(1.12); }
+.doc-link:focus-visible { outline: 2px solid var(--techelet); outline-offset: 2px; }
 .lang-nav { flex: none; display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 .lang-toggle {
   flex: none;
@@ -265,6 +280,12 @@ table.luach {
 .note { color: var(--muted); font-size: 0.9rem; }
 .end { font-family: var(--font-display); font-size: 1.1rem; text-align: center; margin-top: 8px !important; }
 .credit { text-align: center; font-weight: 600; color: var(--techelet); }
+
+/* מסך צר: הכפתורים למעלה בשורה משלהם, מעל הכותרת */
+@media (max-width: 860px) {
+  .masthead { flex-direction: column-reverse; align-items: stretch; }
+  .top-nav { justify-content: flex-start; }
+}
 
 @media (max-width: 560px) {
   .wrap { padding-block: 16px 32px; }

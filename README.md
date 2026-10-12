@@ -15,7 +15,7 @@
 
 ## להעלאה לאחסון אחר
 מעלים לכל אחסון סטטי (GitHub Pages, Netlify, אתר קיים) את התיקיות והקבצים הבאים:
-`index.html`, `css/`, `js/`, `lib/`, `data/`.
+`index.html`, `css/`, `js/`, `lib/`, `data/`, `docs/`.
 אין צורך להעלות את `node_modules/`, `tools/` ו-`package*.json`.
 
 ## קבצים
@@ -29,6 +29,7 @@
 | `lib/hebcal.min.js` | ‏Hebcal 6.14: לוח עברי, פרשות, חגים ויארצייט (רישיון GPLv2) |
 | `js/excel.js` | ייצוא ל-Excel: עיצוב, רשימת בחירה V בעמודות "נלמד" ושורת סיום |
 | `lib/exceljs.min.js` | ‏ExcelJS 4.4: כתיבת קובץ xlsx מעוצב (רישיון MIT) |
+| `docs/about.pdf`, `docs/instructions.pdf` | "אודות הלוח" ו"הוראות ללוח" (הכפתורים בראש הדף). נוצרו מ-`אודות משנה לחק לאתר.pdf` ו-`הוראות הלוח לאתר.pdf` שבתיקייה שמעל. לעדכון מעתיקים את הקובץ החדש באותו שם |
 
 ## פקודות (מתוך התיקייה `Web`)
 - `node tools/build-data.js`: בונה מחדש את `data/luach_data.js` אחרי שינוי ב-JSON.

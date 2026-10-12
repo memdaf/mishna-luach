@@ -6,6 +6,8 @@
 
   const he = {
     title: 'לוח משנה לחק',
+    btnAbout: 'אודות הלוח',
+    btnHelp: 'הוראות ללוח',
 
     // טקסטים שנבנים בזמן ריצה
     footer: 'מוגש ע"י "מפעל החק - משנה לחק"',
@@ -42,6 +44,8 @@
 
   const en = {
     title: 'Mishna LeChok Calendar',
+    btnAbout: 'About',
+    btnHelp: 'Instructions',
     lede: 'Build Mishna LeChok study calendars that combine the Mishnayos chapters of "Chok LeYisrael", to complete all six orders of Mishna in one year or two, or toward a yahrzeit',
     legendMode: 'Calendar type',
     modeAnnual: 'Annual',
@@ -113,6 +117,8 @@
   // אידיש (חסידיש, כתיב סאטמר: בלי סימנים של ייוואָ). רק התפריט וההודעות.
   // הטקסטים של הלוח עצמו (כותרת, עמודות, לט"נ, "מוגש ע"י", הדפסה ו-Excel) לא כתובים כאן, ולכן הם בעברית.
   const yi = {
+    btnAbout: 'וועגן דעם לוח',
+    btnHelp: 'אנווייזונגען צום לוח',
     lede: 'מאכן לוחות פון משנה לחק, צוזאמען מיט די פרקי משניות פון "חק לישראל", כדי צו ענדיגן די ששה סדרי משנה אין איין יאר אדער אין צוויי יאר, אדער אויף א יארצייט',
     legendMode: 'סארט לוח',
     modeAnnual: 'יערליך',
