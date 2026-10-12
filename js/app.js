@@ -533,6 +533,23 @@
 
   $('btnPrint').addEventListener('click', () => window.print());
 
+  // ---- "אודות" ו"הוראות": חלון באמצע הדף ----
+  // רק בדפדפן שמציג PDF בתוך הדף (מחשב). בטלפון הקישור נפתח כרגיל בלשונית חדשה.
+  const dlg = $('docDialog');
+  document.querySelectorAll('.doc-link').forEach(a => a.addEventListener('click', e => {
+    if (!navigator.pdfViewerEnabled || !dlg.showModal || innerWidth < 700) return;
+    e.preventDefault();
+    $('docTitle').textContent = a.textContent;
+    $('docFrame').title = a.textContent;
+    $('docFrame').src = a.getAttribute('href') + '#view=FitH';
+    $('docNewTab').href = a.getAttribute('href');
+    dlg.showModal();
+  }));
+  $('docClose').addEventListener('click', () => dlg.close());
+  $('docNewTab').addEventListener('click', () => dlg.close());
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); }); // לחיצה מחוץ לחלון
+  dlg.addEventListener('close', () => { $('docFrame').src = 'about:blank'; });
+
   $('btnExcel').addEventListener('click', () => {
     const c = current;
     if (!c) return;

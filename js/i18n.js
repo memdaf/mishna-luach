@@ -8,6 +8,8 @@
     title: 'לוח משנה לחק',
     btnAbout: 'אודות הלוח',
     btnHelp: 'הוראות ללוח',
+    docNewTab: 'פתיחה בלשונית חדשה',
+    docClose: 'סגירה',
 
     // טקסטים שנבנים בזמן ריצה
     footer: 'מוגש ע"י "מפעל החק - משנה לחק"',
@@ -46,6 +48,8 @@
     title: 'Mishna LeChok Calendar',
     btnAbout: 'About',
     btnHelp: 'Instructions',
+    docNewTab: 'Open in a new tab',
+    docClose: 'Close',
     lede: 'Build Mishna LeChok study calendars that combine the Mishnayos chapters of "Chok LeYisrael", to complete all six orders of Mishna in one year or two, or toward a yahrzeit',
     legendMode: 'Calendar type',
     modeAnnual: 'Annual',
@@ -119,6 +123,8 @@
   const yi = {
     btnAbout: 'וועגן דעם לוח',
     btnHelp: 'אנווייזונגען צום לוח',
+    docNewTab: 'עפענען אין א נייעם טאב',
+    docClose: 'פארמאכן',
     lede: 'מאכן לוחות פון משנה לחק, צוזאמען מיט די פרקי משניות פון "חק לישראל", כדי צו ענדיגן די ששה סדרי משנה אין איין יאר אדער אין צוויי יאר, אדער אויף א יארצייט',
     legendMode: 'סארט לוח',
     modeAnnual: 'יערליך',

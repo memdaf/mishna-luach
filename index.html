@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Assistant:wght@400;600;700&display=swap">
-<link rel="stylesheet" href="css/style.css?v=19">
+<link rel="stylesheet" href="css/style.css?v=20">
 </head>
 <body>
 <!-- הטקסטים בעברית כתובים כאן. באנגלית הם מוחלפים לפי data-i18n (המילון ב-js/i18n.js) -->
@@ -149,17 +149,27 @@
     </footer>
   </section>
 
+  <!-- חלון באמצע הדף ל"אודות" ו"הוראות" (קובץ PDF). בטלפון הקובץ נפתח בלשונית חדשה -->
+  <dialog id="docDialog" class="doc-dialog">
+    <div class="doc-bar">
+      <h2 id="docTitle"></h2>
+      <a id="docNewTab" class="btn ghost" href="#" target="_blank" rel="noopener" data-i18n="docNewTab">פתיחה בלשונית חדשה</a>
+      <button type="button" id="docClose" class="btn" autofocus data-i18n="docClose">סגירה</button>
+    </div>
+    <iframe id="docFrame" title=""></iframe>
+  </dialog>
+
   <!-- גרסת ההדפסה: נבנית לפני ההדפסה, מחולקת לדפים עם כותרת תחתונה בכל דף -->
   <div id="printArea" class="print-area"></div>
 
 </div>
 
-<script src="lib/hebcal.min.js?v=19"></script>
-<script src="lib/exceljs.min.js?v=19"></script>
-<script src="data/luach_data.js?v=19"></script>
-<script src="js/i18n.js?v=19"></script>
-<script src="js/engine.js?v=19"></script>
-<script src="js/excel.js?v=19"></script>
-<script src="js/app.js?v=19"></script>
+<script src="lib/hebcal.min.js?v=20"></script>
+<script src="lib/exceljs.min.js?v=20"></script>
+<script src="data/luach_data.js?v=20"></script>
+<script src="js/i18n.js?v=20"></script>
+<script src="js/engine.js?v=20"></script>
+<script src="js/excel.js?v=20"></script>
+<script src="js/app.js?v=20"></script>
 </body>
 </html>
