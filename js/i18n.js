@@ -35,7 +35,9 @@
     crossNames: { annual: 'שנתי', 'two-1': 'דו שנתי שנה א', 'two-2': 'דו שנתי שנה ב' },
     titleCross: k => 'השלמת משניות לחק - ' + k + ' בדף אחד',
     crossSummary: n => '<strong>' + n + '</strong> פרשות שיש בהן השלמת משניות',
-    sheetNameCross: 'דוח מוצלב',
+    modeCross: 'בדף אחד',
+    crossKind: 'דף',
+    sheetNameCross: 'בדף אחד',
   };
 
   const en = {
@@ -96,8 +98,8 @@
     head: ['Date', 'Hebrew date', 'Holiday', 'Day', 'Parsha', 'Chok', 'Done', 'Mishna LeChok', 'Done'],
     sheetName: 'Calendar',
 
-    modeCross: 'Cross table',
-    crossKind: 'Table',
+    modeCross: 'On one page',
+    crossKind: 'Page',
     crossAnnual: 'Annual',
     crossTwo1: 'Two-year, Year 1',
     crossTwo2: 'Two-year, Year 2',
@@ -105,7 +107,7 @@
     crossNames: { annual: 'Annual', 'two-1': 'Two-Year, Year 1', 'two-2': 'Two-Year, Year 2' },
     titleCross: k => 'Mishna LeChok - ' + k + ' - on One Page',
     crossSummary: n => '<strong>' + n + '</strong> parshiyos with Mishna LeChok',
-    sheetNameCross: 'Cross table',
+    sheetNameCross: 'One page',
   };
 
   // אידיש (חסידיש, כתיב סאטמר: בלי סימנים של ייוואָ). רק התפריט וההודעות.
@@ -136,6 +138,7 @@
     niftar: 'לעילוי נשמת (אויב מ\'וויל)',
     niftarPh: 'פלוני בן פלוני',
     crossKind: 'בלאט',
+    sheetNameCross: 'אין איין בלאט',
     crossAnnual: 'יערליך',
     crossTwo1: 'צוויי יעריג - ערשטע יאר',
     crossTwo2: 'צוויי יעריג - צווייטע יאר',
