@@ -29,7 +29,7 @@
 | `lib/hebcal.min.js` | ‏Hebcal 6.14: לוח עברי, פרשות, חגים ויארצייט (רישיון GPLv2) |
 | `js/excel.js` | ייצוא ל-Excel: עיצוב, רשימת בחירה V בעמודות "נלמד" ושורת סיום |
 | `lib/exceljs.min.js` | ‏ExcelJS 4.4: כתיבת קובץ xlsx מעוצב (רישיון MIT) |
-| `docs/about.pdf`, `docs/instructions.pdf` | "אודות הלוח" ו"הוראות ללוח" (הכפתורים בראש הדף). במחשב נפתחים בחלון באמצע הדף, ובטלפון בלשונית חדשה. נוצרו מ-`אודות משנה לחק לאתר.pdf` ו-`הוראות הלוח לאתר.pdf` שבתיקייה שמעל. לעדכון מעתיקים את הקובץ החדש באותו שם. התרגומים: `about-yi.pdf`, `about-en.pdf`, `instructions-yi.pdf`, `instructions-en.pdf` (כל שפה מקבלת את הקובץ שלה). הטקסט של התרגומים נמצא ב-`tools/docs/build-docs.js`, ואחרי שינוי מריצים `node tools/docs/build-docs.js` |
+| `docs/about.pdf`, `docs/instructions.pdf` | "אודות הלוח" ו"הוראות ללוח" (הכפתורים בראש הדף). במחשב נפתחים בחלון באמצע הדף, ובטלפון בלשונית חדשה. נוצרו מ-`אודות משנה לחק לאתר.pdf` ו-`הוראות הלוח לאתר.pdf` שבתיקייה שמעל. לעדכון מעתיקים את הקובץ החדש באותו שם. התרגומים: `about-yi.pdf`, `about-en.pdf`, `instructions-yi.pdf`, `instructions-en.pdf` (כל שפה מקבלת את הקובץ שלה). הטקסט של התרגומים נמצא ב-`tools/docs/build-docs.js`, ואחרי שינוי מריצים `node tools/docs/build-docs.js`. הקבצים באנגלית בגודל Letter (ארה"ב), השאר A4 |
 
 ## פקודות (מתוך התיקייה `Web`)
 - `node tools/build-data.js`: בונה מחדש את `data/luach_data.js` אחרי שינוי ב-JSON.
